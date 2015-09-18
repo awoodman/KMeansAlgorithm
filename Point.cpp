@@ -1,65 +1,273 @@
+//
+// Created by Adam on 9/17/2015.
+//
+
+#include <cmath>
 #include "Point.h"
 
-// Default constructor
-// Initializes the point to (0.0, 0.0)
-Point::Point() {
-  x = 0.0;
-  y = 0.0;
-  z = 0.0;
-}
+namespace Clustering {
 
-// Custom Constructor
-// Initializes the point to (initX, initY)
-Point::Point(double initX, double initY, double initZ) {
-  x = initX;
-  y = initY;
-  z = initZ;
-}
+// Constructors
+    Point::Point(int dimension)     // Constructor to set all coordinates to 0
+    {
+        dim = dimension;
+
+        values = new double[dim];
+
+        for (int i = 0; i < dim; i++) {
+            values[i] = 0;
+        }
+    }
+
+    Point::Point(int dimension, double *array)      // Constructor to pass in an array
+    {
+        dim = dimension;
+
+        values = new double[dim];
+
+        for (int i = 0; i < dim; i++) {
+            values[i] = array[i];
+        }
+    }
+
+    //Copy Constructor
+    Point::Point(const Point & src)                         // Pass in source point
+    {
+        if (this != &src)                                    // Only do this stuff if source and this are different locations
+        {
+            dim = src.getDims();                           // Copy Dimension
+
+            values = new double[dim];                       // Allocate new memory
+
+            for (int i = 0; i < src.getDims(); i++) {
+                values[i] = src.getValue(i);                // Copy coordinates over
+            }
+        }
+        else {
+            values = NULL;                                  // I don't want this to point anywhere
+        }
+    }
+
+    //Assignment Operator
+    Point& Point::operator=(const Point & src)
+    {
+        if (this == &src)                                   // If a = a, return a
+        {
+            return *this;
+        }
+        else
+        {
+            dim = src.getDims();                            // Copy Dimension
+
+            values = new double[dim];                       // Allocate new memory
+
+            for (int i = 0; i < src.getDims(); i++) {
+                values[i] = src.getValue(i);                // Copy coordinates over
+            }
+
+            return *this;                                   // this points to the calling object
+        }
+    }
+
+    //Destructor
+    // Dynamic allocation for coordinates array, so must deallocate (delete) the memory
+    Point::~Point() {
+        delete[] values;
+    }
+
+    double Point::distanceTo(const Point &p) const         // Distance to, with any number of dims
+    {
+        double inside = 0;
+
+        for (int i = 0; i < dim; i++) {
+            inside += pow((p.getValue(i) - values[i]), 2);
+        }
+
+        double distance = sqrt(inside);
+        return distance;
+    }
+
+    void Point::setValue(int dimension, double coord)     // Set a coordinate
+    {
+        values[dimension] = coord;
+    }
+
+    double Point::getValue(int dimension) const   // Get a coordinate
+    {
+        return values[dimension];
+    }
 
 
-// Destructor
-// No dynamic allocation, so nothing to do; if omitted, generated automatically
-Point::~Point() {
-  // no-op
-}
+    // Members
+    Point& Point::operator*=(double multiplier)
+    {
+        for (int i = 0; i < dim; i++)
+        {
+            values[i] = values[i]*multiplier;
+        }
 
+        return *this;
+    }
 
-// Mutator methods
-// Change the values of private member variables
+    Point& Point::operator/=(double denom)
+    {
+        for (int i = 0; i < dim; i++)
+        {
+            values[i] = values[i]/denom;
+        }
 
-void Point::setX(double newX) {
-  x = newX;
-}
+        return *this;
+    }
 
-void Point::setY(double newY) {
-  y = newY;
-}
+    const Point Point::operator*(double multiplier) const
+    {
+        Point product(this->getDims());
 
-void Point::setZ(double newZ) {
-  z = newZ;
-}
+        for (int i = 0; i < this->getDims(); i++)
+        {
+            product.setValue(i,this->getValue(i));
+        }
 
+        for (int i = 0; i < this->getDims(); i++)
+        {
 
-// Accessors
-// Return the current values of private member variables
+            product.setValue(i,(product.getValue(i))*multiplier);
+        }
 
-double Point::getX() {
-  return x;
-}
+        return product;
+    }
 
-double Point::getY() {
-  return y;
-}
+    const Point Point::operator/(double denom) const
+    {
+        Point product(this->getDims());
 
-double Point::getZ() {
-  return z;
-}
+        for (int i = 0; i < this->getDims(); i++)
+        {
+            product.setValue(i,this->getValue(i));
+        }
 
+        for (int i = 0; i < this->getDims(); i++)
+        {
 
-// Distance Calculator Function
+            product.setValue(i,(product.getValue(i))/denom);
+        }
 
-double Point::distanceTo(Point &p) {
-  double dist;
-  dist = sqrt(pow((p.getX()-x),2)+pow((p.getY()-y),2)+pow((p.getZ()-z),2));      // sqrt((x2-x1)^2+(y2-y1)^2+(z2-z1)^2)
-  return dist;
+        return product;
+    }
+
+    Point &operator+=(Point & dst, const Point & src)
+    {
+        for (int i = 0; i < dst.getDims(); i++)
+        {
+            dst.values[i] = dst.values[i] + src.values[i];
+        }
+
+        return dst;
+    }
+
+    Point &operator-=(Point & dst, const Point & src)
+    {
+        for (int i = 0; i < dst.getDims(); i++)
+        {
+            dst.values[i] = dst.values[i] - src.values[i];
+        }
+
+        return dst;
+    }
+
+    const Point operator+(const Point & lhs, const Point & rhs)
+    {
+        Point result(lhs.getDims());
+
+        for (int i = 0; i < lhs.getDims(); i++)
+        {
+            result.setValue(i,(lhs.getValue(i)+rhs.getValue(i)));
+        }
+
+        return result;
+    }
+
+    const Point operator-(const Point & lhs, const Point & rhs)
+    {
+        Point result(lhs.getDims());
+
+        for (int i = 0; i < lhs.getDims(); i++)
+        {
+            result.setValue(i,(lhs.getValue(i)-rhs.getValue(i)));
+        }
+
+        return result;
+    }
+
+    bool operator==(const Point & lhs, const Point & rhs)
+    {
+        for (int i  = 0; i < lhs.getDims(); i++)
+        {
+            if (lhs.getValue(i) != rhs.getValue(i))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool operator!=(const Point & lhs, const Point & rhs)
+    {
+        for (int i  = 0; i < lhs.getDims(); i++)
+        {
+            if (lhs.getValue(i) == rhs.getValue(i))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool operator<(const Point & lhs, const Point & rhs)
+    {
+        for (int i  = 0; i < lhs.getDims(); i++)
+        {
+            if (lhs.getValue(i) >= rhs.getValue(i))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool operator>(const Point & lhs, const Point & rhs)
+    {
+        for (int i  = 0; i < lhs.getDims(); i++)
+        {
+            if (lhs.getValue(i) <= rhs.getValue(i))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool operator<=(const Point & lhs, const Point & rhs)
+    {
+        for (int i  = 0; i < lhs.getDims(); i++)
+        {
+            if (lhs.getValue(i) > rhs.getValue(i))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool operator>=(const Point & lhs, const Point & rhs)
+    {
+        for (int i  = 0; i < lhs.getDims(); i++)
+        {
+            if (lhs.getValue(i) < rhs.getValue(i))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 }
