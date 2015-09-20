@@ -8,6 +8,11 @@
 namespace Clustering {
 
 // Constructors
+    Point::Point()
+    {
+        std::cout << "There is no default constructor in place.  Sorry!" << std::endl;
+    }
+
     Point::Point(int dimension)     // Constructor to set all coordinates to 0
     {
         dim = dimension;
@@ -181,7 +186,7 @@ namespace Clustering {
 
         for (int i = 0; i < lhs.getDims(); i++)
         {
-            result.setValue(i,(lhs.getValue(i)+rhs.getValue(i)));
+            result.setValue(i,(lhs.values[i]+rhs.values[i]));
         }
 
         return result;
@@ -191,9 +196,9 @@ namespace Clustering {
     {
         Point result(lhs.getDims());
 
-        for (int i = 0; i < lhs.getDims(); i++)
+        for (int i = 0; i < lhs.dim; i++)
         {
-            result.setValue(i,(lhs.getValue(i)-rhs.getValue(i)));
+            result.setValue(i,(lhs.values[i]-rhs.values[i]));
         }
 
         return result;
@@ -201,9 +206,9 @@ namespace Clustering {
 
     bool operator==(const Point & lhs, const Point & rhs)
     {
-        for (int i  = 0; i < lhs.getDims(); i++)
+        for (int i  = 0; i < lhs.dim; i++)
         {
-            if (lhs.getValue(i) != rhs.getValue(i))
+            if (lhs.values[i] != rhs.values[i])
             {
                 return false;
             }
@@ -213,61 +218,99 @@ namespace Clustering {
 
     bool operator!=(const Point & lhs, const Point & rhs)
     {
-        for (int i  = 0; i < lhs.getDims(); i++)
+        bool decision;
+        for (int i  = 0; i < lhs.dim; i++)
         {
-            if (lhs.getValue(i) == rhs.getValue(i))
+            if (lhs.values[i] == rhs.values[i])
             {
-                return false;
+                decision = false;
             }
+            else
+                return true;
         }
-        return true;
+
+        return decision;
     }
 
     bool operator<(const Point & lhs, const Point & rhs)
     {
-        for (int i  = 0; i < lhs.getDims(); i++)
+        bool decision;
+        for (int i  = 0; i < lhs.dim; i++)
         {
-            if (lhs.getValue(i) >= rhs.getValue(i))
+            if (lhs.values[i] > rhs.values[i])
             {
                 return false;
             }
+            else if (lhs.values[i] == rhs.values[i])
+                decision = false;
+            else if (lhs.values[i] < rhs.values[i])
+                return true;
         }
-        return true;
+        return decision;
     }
 
     bool operator>(const Point & lhs, const Point & rhs)
     {
-        for (int i  = 0; i < lhs.getDims(); i++)
+        bool decision;
+        for (int i  = 0; i < lhs.dim; i++)
         {
-            if (lhs.getValue(i) <= rhs.getValue(i))
+            if (lhs.values[i] < rhs.values[i])
             {
                 return false;
             }
+            else if (lhs.values[i] == rhs.values[i])
+                decision = false;
+            else if (lhs.values[i] > rhs.values[i])
+                return true;
         }
-        return true;
+        return decision;
     }
 
     bool operator<=(const Point & lhs, const Point & rhs)
     {
-        for (int i  = 0; i < lhs.getDims(); i++)
+        bool decision = true;
+        for (int i  = 0; i < lhs.dim; i++)
         {
-            if (lhs.getValue(i) > rhs.getValue(i))
+            if (lhs.values[i] > rhs.values[i])
             {
                 return false;
             }
+            else if (lhs.values[i] == rhs.values[i])
+            {
+                decision = true;
+            }
+            else if (lhs.values[i] < rhs.values[i])
+                return true;
         }
-        return true;
+        return decision;
     }
 
     bool operator>=(const Point & lhs, const Point & rhs)
     {
-        for (int i  = 0; i < lhs.getDims(); i++)
+        bool decision = true;
+        for (int i  = 0; i < lhs.dim; i++)
         {
-            if (lhs.getValue(i) < rhs.getValue(i))
+            if (lhs.values[i] < rhs.values[i])
             {
                 return false;
             }
+            else if (lhs.values[i] == rhs.values[i])
+            {
+                decision = true;
+            }
+            else if (lhs.values[i] > rhs.values[i])
+                return true;
         }
-        return true;
+        return decision;
+    }
+
+    std::ostream &operator<<(std::ostream & outputStream, const Point & rhs)
+    {
+        for (int i = 0; i < rhs.dim; i++)
+        {
+            outputStream << rhs.values[i] << " ";
+        }
+
+        return outputStream;
     }
 }

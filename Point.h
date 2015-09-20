@@ -14,6 +14,7 @@ namespace Clustering {
         double *values; // values of the point's dimensions
 
     public:
+        Point();
         Point(int);             // Constructor with only # of dimensions passed to it
         Point(int, double *);   // Optional constructor to pass in dimensions and array of doubles
 
@@ -60,8 +61,8 @@ namespace Clustering {
         friend bool operator<=(const Point &, const Point &);
         friend bool operator>=(const Point &, const Point &);
 
-//        friend std::ostream &operator<<(std::ostream &, const Point &);
-//        friend std::istream &operator>>(std::istream &, Point &);
+        friend std::ostream &operator<<(std::ostream &, const Point &);
+//        friend std::istream &operator>>(std::istream &, Point &); // TODO Implement!
     };
 
 }
