@@ -9,8 +9,8 @@
 
 namespace Clustering {
 
-    typedef Point *PointPtr;
-    typedef struct LNode *LNodePtr;
+    typedef Point *PointPtr;                    // Pointer to a point (goes inside node)
+    typedef struct LNode *LNodePtr;             // Pointer to an LNode
 
     struct LNode { // linked-list node
         PointPtr p;
@@ -19,12 +19,12 @@ namespace Clustering {
 
     class Cluster {
         int size;
-        LNodePtr points; // linked-list head
+        LNodePtr points; // linked-list head (points to first node)
 
     public:
         Cluster() : size(0), points(nullptr) {};
 
-        // The big three: cpy ctor, overloaded operator=, dtor
+        // The big three: cpy constructor, overloaded operator=, destructor
         Cluster(const Cluster &);
         Cluster &operator=(const Cluster &);
         ~Cluster();
@@ -48,15 +48,15 @@ namespace Clustering {
 
         // Set-destructive operators (duplicate points in the space)
         // Friends
-        friend const Cluster operator+(const Cluster &lhs, const Cluster &rhs);
-        friend const Cluster operator-(const Cluster &lhs, const Cluster &rhs);
+        friend const Cluster operator+(const Cluster &lhs, const Cluster &rhs); // Cannot be returning a const if returning a new cluster
+        friend const Cluster operator-(const Cluster &lhs, const Cluster &rhs); // See above comment
 
         friend const Cluster operator+(const Cluster &lhs, const PointPtr &rhs);
         friend const Cluster operator-(const Cluster &lhs, const PointPtr &rhs);
 
-        // IO
-        friend std::ostream &operator<<(std::ostream &, const Cluster &);
-        friend std::istream &operator>>(std::istream &, Cluster &);
+//         IO
+//
+//        friend std::istream &operator>>(std::istream &, Cluster &);
 
     };
 }

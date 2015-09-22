@@ -40,7 +40,7 @@ namespace Clustering {
     {
         if (this != &src)                                    // Only do this stuff if source and this are different locations
         {
-            dim = src.getDims();                           // Copy Dimension
+            dim = src.dim;                           // Copy Dimension
 
             values = new double[dim];                       // Allocate new memory
 
@@ -62,7 +62,7 @@ namespace Clustering {
         }
         else
         {
-            dim = src.getDims();                            // Copy Dimension
+            dim = src.dim;                            // Copy Dimension
 
             values = new double[dim];                       // Allocate new memory
 
@@ -85,7 +85,7 @@ namespace Clustering {
         double inside = 0;
 
         for (int i = 0; i < dim; i++) {
-            inside += pow((p.getValue(i) - values[i]), 2);
+            inside += pow((p.values[i] - values[i]), 2);
         }
 
         double distance = sqrt(inside);
