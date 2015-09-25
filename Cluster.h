@@ -48,14 +48,14 @@ namespace Clustering {
 
         // Set-destructive operators (duplicate points in the space)
         // Friends
-        friend const Cluster operator+(const Cluster &lhs, const Cluster &rhs); // Cannot be returning a const if returning a new cluster
-        friend const Cluster operator-(const Cluster &lhs, const Cluster &rhs); // See above comment
+        friend const Cluster operator+(const Cluster &lhs, const Cluster &rhs);
+        friend const Cluster operator-(const Cluster &lhs, const Cluster &rhs);
 
         friend const Cluster operator+(const Cluster &lhs, const PointPtr &rhs);
         friend const Cluster operator-(const Cluster &lhs, const PointPtr &rhs);
 
 //         IO
-//
+//        friend std::ostream &operator<<(std::ostream &, Cluster &);
 //        friend std::istream &operator>>(std::istream &, Cluster &);
 
     };

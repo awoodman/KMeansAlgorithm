@@ -9,41 +9,35 @@ namespace Clustering {
     //Copy Constructor
     Cluster::Cluster(const Cluster & src)
     {
-        if (this != &src)                                       // Only do this stuff if source and this are different locations
+        if (src.points == nullptr)
         {
-            size = src.size;                                    // Copy Size
-
-            LNode *prevNode;                                    // Address of last node worked on
-            LNode *CurrentNode;
-            LNode *sourceNode;
-            PointPtr newPoint;
-
-            for (int i = 0; i < size; i++)
-            {
-
-                CurrentNode = new LNode;                        // Create new node
-                CurrentNode->next = nullptr;                    // Make new node next point to null (will be overwritten)
-
-                if (i == 0) {
-                    sourceNode = src.points;                    // Source Head Pointer
-                    points = CurrentNode;                       // New Head pointer points to the first node
+            this->size = 0;
+            this->points = nullptr;
+        }
+        else
+        {
+            this->size = src.size;
+            LNodePtr currNode;
+            LNodePtr prevNode;
+            LNodePtr copyNode = src.points;
+            int i = 1;
+            while(copyNode != nullptr) {
+                currNode = new LNode;
+                if (i > 1) {
+                    prevNode->next = currNode;
                 }
-                else {
-                    prevNode->next = CurrentNode;               // Make previous nodes next = the current node
-                    sourceNode = sourceNode->next;              // Source node = the next source node
+                currNode->next = nullptr;
+                if (i == 1) {
+                    this->points = currNode;
                 }
-
-                newPoint = new Point;                           // Create a new point dynamically
-
-                Point newPoint(*sourceNode->p);                 // Call Point copy constructor
-
-                CurrentNode->p = &newPoint;                     // Make CurrentNode point to location of newPoint
-
-                prevNode = CurrentNode;                         // Copy address of current node into prevNode
+                currNode->p = copyNode->p;
+                copyNode = copyNode->next;
+                prevNode = currNode;
+                i++;
             }
-
         }
     }
+
 
     //Assignment Operator
     Cluster &Cluster::operator=(const Cluster & src)
@@ -54,32 +48,39 @@ namespace Clustering {
         }
         else                                                // Copy everything over
         {
-            size = src.size;                                // Copy Size
-            LNode *prevNode;                                // Address of last node worked on
-            LNode *CurrentNode;
-            LNode *sourceNode;
-            Point *newPoint;
+            // Delete the existing list
+            LNodePtr node = this->points;         // "Current Node" to traverse old list and delete it
+            LNodePtr nextNode;
 
-            for (int i = 0; i < size; i++)
+            while (node != nullptr)                 // Clear existing linked list
             {
-                if (i == 0)                                 // First Node
+                nextNode = node->next;
+                delete node;
+                node = nextNode;
+            }
+
+            LNodePtr sourceNode = src.points;
+            LNodePtr currentNode = new LNode;
+
+            LNodePtr prevNode;
+            this->points = currentNode;
+
+            if (src.size == 1)
+            {
+                currentNode->p = sourceNode->p;
+                currentNode->next = nullptr;
+            }
+            else
+            {
+                while (sourceNode->next != nullptr)
                 {
-                    sourceNode = src.points;                // Address of first source node
-                    points = CurrentNode;                   // Head Pointer for new cluster
-                }
-                else                                        // Post First Node
-                {
-                    prevNode->next = CurrentNode;
+                    currentNode->p = sourceNode->p;
+                    prevNode = currentNode;
+                    currentNode = new LNode;
+                    prevNode->next = currentNode;
                     sourceNode = sourceNode->next;
                 }
-
-                newPoint = new Point;
-
-                Point newPoint(*sourceNode->p);
-
-                CurrentNode->p = &newPoint;
-
-                prevNode = CurrentNode;
+                currentNode->next = nullptr;
             }
 
             return *this;                                   // this points to the calling object
@@ -89,195 +90,212 @@ namespace Clustering {
     //Destructor
     Cluster::~Cluster()
     {
-        LNode *Node;
+        LNodePtr node = this->points;         // "Current Node" to traverse old list and delete it
+        LNodePtr nextNode;
 
-        for (int i = 0; i < size; i++)
+        while (node != nullptr)
         {
-            Node = points;
-            points = Node->next;
-
-            delete Node->p;                                 // Delete pointer to point in node
-
-            delete Node;                                    // Delete node itself
+            nextNode = node->next;
+            delete node;
+            node = nextNode;
         }
     }
 
     void Cluster::add(const PointPtr & newPoint)
     {
-        LNode * newNode = new LNode;                        // Allocate new LNode
-        newNode->next = nullptr;
-        newNode->p = newPoint;
-        LNode *Node;
+        LNode *node = this->points;
+        LNode *prevnode;
+        LNode *newnode = new LNode;
+        newnode->next = nullptr;
+        newnode->p = newPoint;
 
-        if (size == 0)
-        {
-            points = newNode;
-        }
-        else
-        {
-            Node = points;                                  // Node = address of head ptr
-            for (int i = 0; i < size; i++)                  // Walk through existing node
-            {
-                if (newNode->p >= Node->p) {
-                    newNode->next = Node->next;
-                    Node->next = newNode;
-                    break;
+        if(size == 0)                                                   // empty cluster, just point to newnode
+            this->points = newnode;
+        else {
+            while (node != nullptr) {                               // dont walk of the end of the node list
+                if (*newnode->p < *node->p) {                   // newnode goes before node
+                    if (node == this->points) {              //  newnode will be first node now
+                        newnode->next = this->points;
+                        this->points = newnode;
+                    } else {                                //  newnode goes between prevnode and node
+                        newnode->next = prevnode->next;
+                        prevnode->next = newnode;
+                    }
+                    this->size++;                            // all done, inc size and return
+                    return;
                 }
-                else
-                {
-                    Node = Node->next;
-                }
+                prevnode = node;
+                node = node->next;
             }
+            prevnode->next = newnode;                               // newnode is now last node
         }
-
-        size++;                                             // Increment size
+        this->size++;
     }
 
     const PointPtr & Cluster::remove(const PointPtr & remPoint)
     {
-        LNode * Node = points;                              // Node points to first node
-        LNode * prevNode;
-
-        for (int i = 0; i < size; i++)
+        LNodePtr node = this->points;
+        LNodePtr prevNode;
+        bool remove = false;
+        if (node != nullptr)                            // If at least one node is in the list
         {
-            if (Node->p == remPoint)
+            if (remPoint == node->p)                    // If first node is what we're removing
             {
-                if (i == 0) {
-                    points = Node->next;
-                }
-                else
-                {
-                    prevNode->next = Node->next;
-                }
-                break;
+                this->points = node->next;              // Remove first node from list
+                delete node;                            // Delete first node
+                remove = true;
+                this->size--;
             }
-            else {
-                prevNode = Node;
-                Node = Node->next;
+            else
+            {
+                while (node != nullptr && !(remove)) {                   // While not at end of list
+                    prevNode = node;                        // Node before "node"
+                    node = node->next;                      // Go to next node for comparison
+                    if (remPoint == node->p) {
+                        prevNode->next = node->next;        // Remove the node
+                        delete node;
+                        remove = true;
+                        this->size--;
+                    }
+                }
             }
         }
-
-        delete Node;
-
         return remPoint;
     }
 
     const Cluster operator+(const Cluster &lhs, const PointPtr &rhs)
     {
-        Cluster resCluster(lhs);                               // Make new cluster to copy into
-
-        LNode * newNode = new LNode;                           // Allocate new LNode
-        newNode->next = nullptr;
-        newNode->p = rhs;
-        LNode *Node;
-
-        if (lhs.size == 0)
-        {
-            resCluster.points = newNode;
-            newNode->p = rhs;
-        }
-        else
-        {
-            Node = lhs.points;                                  // Node = address of headptr
-            for (int i = 0; i < lhs.size; i++)                  // Walk through existing node
-            {
-                if (newNode->p >= Node->p) {
-                    newNode->next = Node->next;
-                    Node->next = newNode;
-                    break;
-                }
-                else
-                {
-                    Node = Node->next;
-                }
-            }
-        }
-
-        resCluster.size++;                                             // Increment size
-
-        return resCluster;
+        Cluster tempCluster(lhs);                           //Create temporary cluster to return, copying from lhs
+        tempCluster.add(rhs);                               // Implement add()
+        return tempCluster;
     }
 
-    const Cluster operator-(const Cluster &sourceCluster, const PointPtr &sourcePoint)
+    const Cluster operator-(const Cluster &lhs, const PointPtr &rhs)
     {
-        Cluster resCluster(sourceCluster);                            // Copy lhs into 'result' cluster
-
-        LNode * Node = sourceCluster.points;                 // Node points to first node in source cluster
-        LNode * prevNode;                                   // Pointer to previous node
-
-        for (int i = 0; i < sourceCluster.size; i++)
-        {
-            if (Node->p == sourcePoint)                             // if node point = what we're subtracting
-            {
-                if (i == 0) {
-                    resCluster.points = Node->next;                 // set headptr to next, removing first node from res
-                }
-                else
-                {
-                    prevNode->next = Node->next;                    // Remove link from middle of list
-                }
-                break;
-            }
-            else {
-                prevNode = Node;                                    // set previous to current
-                Node = Node->next;                                  // go to next link
-            }
-        }
-
-        delete Node;
-        resCluster.size--;
-        return resCluster;
+        Cluster tempCluster(lhs);                           // Copy c into temp
+        tempCluster.remove(rhs);                            // Implement remove()
+        return tempCluster;
     }
 
     bool operator==(const Cluster &lhs, const Cluster &rhs)
     {
-        LNode *rhsNode = rhs.points;                        // rhsNode is pointer to rhs cluster "points"
-        LNode *lhsNode = lhs.points;                        // lhsNode is pointer to rhs cluster "points"
+        LNodePtr rhsNode = rhs.points;                        // rhsNode is pointer to rhs cluster "points"
+        LNodePtr lhsNode = lhs.points;                        // lhsNode is pointer to lhs cluster "points"
 
-        if (lhs.size != rhs.size) {
+        //3 Potential Cases
+        if (lhs.size != rhs.size) {                        // If cluster sizes aren't the same
             return false;
         }
-        for (int i = 0; i < lhs.size; i++)
+        else if (lhs.size == 1)                            // If both clusters only have one node
         {
-            if (rhsNode->p != lhsNode->p) {
+            if (lhsNode->p == rhsNode->p)
+            {
+                return true;
+            }
+            return false;
+        }
+        else {                                              // If sizes are greater than one
+            while (rhsNode->next != nullptr) {
+                if (rhsNode->p != lhsNode->p) {
+                    return false;
+                }
+                rhsNode = rhsNode->next;
+                lhsNode = lhsNode->next;
+            }
+
+            if (rhsNode->p != lhsNode->p)
+            {
                 return false;
             }
 
-            rhsNode = rhsNode->next;
-            lhsNode = lhsNode->next;
+            return true;
         }
-
-        return true;
     }
+
 
     //Union
     const Cluster operator+(const Cluster &lhs, const Cluster &rhs) {
-
+        Cluster tempCLuster(lhs);
         bool add;
-        Cluster result(lhs);
-        LNode *lhsNode;
-        LNode *rhsNode = rhs.points;
 
-        while (rhsNode != nullptr) {
-
-            lhsNode = lhs.points;
-            add = true;
-
-            while (lhsNode != nullptr) {
-                if (lhsNode->p == rhsNode->p) {
-                    add = false;
-                    break;
-                }
-                lhsNode = lhsNode->next;
+        if (tempCLuster.size == 0)
+        {
+            if (rhs.size == 1)
+            {
+                LNodePtr node = rhs.points;
+                tempCLuster.add(node->p);
             }
-            if (add == true) {
-                result.add(rhsNode->p);
-                rhsNode = rhsNode->next;
-            }
+            else {
+                LNodePtr copyNode = rhs.points;
+                LNodePtr nextCopyNode = copyNode->next;
 
-            return result;
+                do {
+                    tempCLuster.add(copyNode->p);
+                    copyNode = copyNode->next;
+                    nextCopyNode = nextCopyNode->next;
+                } while (nextCopyNode != nullptr);
+            }
         }
+
+        else if (tempCLuster.size == 1)
+        {
+            if (rhs.size > 1) {
+                LNodePtr tempNode = tempCLuster.points;
+                LNodePtr copyNode = rhs.points;
+                LNodePtr nextCopyNode = copyNode->next;
+
+                do {
+                    if (tempNode->p == copyNode->p)
+                        add = false;
+                    else
+                        add = true;
+
+                    if (add)
+                        tempCLuster.add(copyNode->p);
+
+                    copyNode = copyNode->next;
+                    nextCopyNode = nextCopyNode->next;
+
+                } while (nextCopyNode != nullptr);
+            }
+            else
+            {
+                LNodePtr tempNode = tempCLuster.points;
+                LNodePtr copyNode = rhs.points;
+
+                if (tempNode->p != copyNode->p)
+                    tempCLuster.add(copyNode->p);
+            }
+        }
+
+        else {
+            LNodePtr tempNode = tempCLuster.points;
+            LNodePtr nextTempNode = tempNode->next;
+            LNodePtr copyNode = rhs.points;
+            LNodePtr nextCopyNode = copyNode->next;
+
+            do {
+                do {
+                    if (tempNode->p != copyNode->p) {
+                        tempNode = tempNode->next;
+                        nextTempNode = nextTempNode->next;
+                        add = true;
+                    }
+                    else
+                        add = false;
+                } while (nextTempNode != nullptr && add);
+
+                if (add) {
+                    tempCLuster.add(copyNode->p);
+                }
+                copyNode = copyNode->next;
+                nextCopyNode = nextCopyNode->next;
+            } while (nextCopyNode != nullptr);
+        }
+        return tempCLuster;
     }
+
+    //////////////////////////////  LEFT OFF HERE  ///////////////////////////////////
 
     // Intersection
     const Cluster operator-(const Cluster &lhs, const Cluster &rhs) {
@@ -364,15 +382,4 @@ namespace Clustering {
         return *this;
     }
 
-//    std::ostream & operator<<(std::ostream & os, const Cluster & sourceCluster)
-//    {
-//        LNode *thisNode = sourceCluster.points;
-//
-//        while(thisNode != nullptr) {
-//            os << *thisNode->p;
-//            thisNode = thisNode->next;
-//        }
-//
-//        return os;
-//    }
 }
