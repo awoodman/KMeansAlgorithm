@@ -40,7 +40,7 @@ namespace Clustering {
     {
         if (this != &src)                                    // Only do this stuff if source and this are different locations
         {
-            dim = src.dim;                           // Copy Dimension
+            dim = src.dim;                                  // Copy Dimension
 
             values = new double[dim];                       // Allocate new memory
 
@@ -116,6 +116,11 @@ namespace Clustering {
 
     Point& Point::operator/=(double denom)
     {
+        if (denom == 0) {
+            std::cout << "Cannot divide by zero" << std::endl;
+            return *this;
+        }
+
         for (int i = 0; i < dim; i++)
         {
             values[i] = values[i]/denom;
@@ -145,6 +150,11 @@ namespace Clustering {
     const Point Point::operator/(double denom) const
     {
         Point product(this->getDims());
+
+        if (denom == 0) {
+            std::cout << "Cannot divide by zero" << std::endl;
+            return *this;
+        }
 
         for (int i = 0; i < this->getDims(); i++)
         {

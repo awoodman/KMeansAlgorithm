@@ -57,34 +57,37 @@ namespace Clustering {
                 nextNode = node->next;
                 delete node;
                 node = nextNode;
+                this->size--;
             }
 
-            LNodePtr sourceNode = src.points;
-            LNodePtr currentNode = new LNode;
-
-            LNodePtr prevNode;
-            this->points = currentNode;
-
-            if (src.size == 1)
-            {
-                currentNode->p = sourceNode->p;
-                currentNode->next = nullptr;
-            }
+            if (src.size == 0)
+                this->points = nullptr;
             else
             {
-                while (sourceNode->next != nullptr)
+                int i = 1;
+                LNodePtr sourceNode = src.points;
+                LNodePtr prevNode;
+                while (sourceNode != nullptr)
                 {
-                    currentNode->p = sourceNode->p;
-                    prevNode = currentNode;
-                    currentNode = new LNode;
-                    prevNode->next = currentNode;
+                    LNodePtr newNode = new LNode;
+                    if (i == 1)
+                    {
+                        this->points = newNode;
+                    }
+                    newNode->next = nullptr;
+                    if (i > 1)
+                    {
+                        prevNode->next = newNode;
+                    }
+                    newNode->p = sourceNode->p;
                     sourceNode = sourceNode->next;
+                    prevNode = newNode;
+                    i++;
+                    this->size++;
                 }
-                currentNode->next = nullptr;
             }
-
-            return *this;                                   // this points to the calling object
         }
+        return *this;
     }
 
     //Destructor
@@ -104,8 +107,8 @@ namespace Clustering {
     void Cluster::add(const PointPtr & newPoint)
     {
         LNode *node = this->points;
-        LNode *prevnode;
-        LNode *newnode = new LNode;
+        LNodePtr prevnode;
+        LNodePtr newnode = new LNode;
         newnode->next = nullptr;
         newnode->p = newPoint;
 
@@ -113,7 +116,7 @@ namespace Clustering {
             this->points = newnode;
         else {
             while (node != nullptr) {                               // dont walk of the end of the node list
-                if (*newnode->p < *node->p) {                   // newnode goes before node
+                if (*newnode->p <= *node->p) {                   // newnode goes before node
                     if (node == this->points) {              //  newnode will be first node now
                         newnode->next = this->points;
                         this->points = newnode;
@@ -181,34 +184,29 @@ namespace Clustering {
     {
         LNodePtr rhsNode = rhs.points;                        // rhsNode is pointer to rhs cluster "points"
         LNodePtr lhsNode = lhs.points;                        // lhsNode is pointer to lhs cluster "points"
+        bool decision = true;
 
         //3 Potential Cases
         if (lhs.size != rhs.size) {                        // If cluster sizes aren't the same
             return false;
         }
-        else if (lhs.size == 1)                            // If both clusters only have one node
+        else if ((lhs.size == 0) && (rhs.size == 0))                            // If both clusters have 0
         {
-            if (lhsNode->p == rhsNode->p)
-            {
-                return true;
-            }
-            return false;
-        }
-        else {                                              // If sizes are greater than one
-            while (rhsNode->next != nullptr) {
-                if (rhsNode->p != lhsNode->p) {
-                    return false;
-                }
-                rhsNode = rhsNode->next;
-                lhsNode = lhsNode->next;
-            }
-
-            if (rhsNode->p != lhsNode->p)
-            {
-                return false;
-            }
-
             return true;
+        }
+        else {                                              // If sizes are greater than 0
+            while ((rhsNode != nullptr) && (lhsNode != nullptr) && (decision == true))
+            {
+                if (lhsNode->p == rhsNode->p)
+                {
+                    decision = true;
+                    lhsNode = lhsNode->next;
+                    rhsNode = rhsNode->next;
+                }
+                else
+                    return false;
+            }
+            return decision;
         }
     }
 
@@ -302,14 +300,14 @@ namespace Clustering {
 
         bool remove;
         Cluster result(lhs);
-        LNode *lhsNode;
-        LNode *rhsNode = rhs.points;
+        LNodePtr lhsNode;
+        LNodePtr rhsNode = rhs.points;
 
         while (rhsNode != nullptr) {                       // loop through all points in the right cluster
             remove = false;
             lhsNode = lhs.points;
-            while (lhsNode != nullptr) {                  // loop through all points in the left cluster
-                if (lhsNode->p == rhsNode->p) {    // if the point is in both clusters dont remove it
+            while (lhsNode != nullptr) {                     // loop through all points in the left cluster
+                if (lhsNode->p == rhsNode->p) {             // if the point is in both clusters dont remove it
                     remove = true;
                     break;
                 }
@@ -368,16 +366,40 @@ namespace Clustering {
         return *this;
     }
 
-    Cluster & Cluster::operator+=(const Point & rhs)
+    Cluster & Cluster::operator+=(const Point & rhs)        // Creates a new point on the heap
     {
-        this->add((const PointPtr)&rhs);
-
+        PointPtr newPoint = new Point(rhs);
+        this->add(newPoint);
         return *this;
     }
 
-    Cluster & Cluster::operator-=(const Point &rhs)
+    Cluster & Cluster::operator-=(const Point &rhs)         // Removes ONE instance on the point passed
     {
-        this->remove((const PointPtr)&rhs);
+        bool found = false;
+        if (this->points == nullptr)
+            return *this;
+        else {
+            LNodePtr node = this->points;
+            LNodePtr prevNode;
+            int i = 1;
+            while (!(found) && node != nullptr) {
+                if (*(node->p) == rhs)
+                {
+                    if (i == 1)
+                        this->points = node->next;
+                    if (i > 1)
+                        prevNode->next = node->next;
+                    delete node;
+                    found = true;
+                    this->size--;
+                }
+                i++;
+                prevNode = node;
+                node = node->next;
+            }
+        }
+        if (!(found))
+            std::cout << "Could not find this point in the cluster" << std::endl;
 
         return *this;
     }

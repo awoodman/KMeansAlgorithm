@@ -36,9 +36,9 @@ namespace Clustering {
 
         // Members
         Point &operator*=(double);
-        Point &operator/=(double); // TODO disallow division by zero
+        Point &operator/=(double);
         const Point operator*(double) const; // prevent (p1*2) = p2;
-        const Point operator/(double) const; // TODO disallow division by zero
+        const Point operator/(double) const;
 
         double &operator[](int index) // TODO out-of-bds?
         {
