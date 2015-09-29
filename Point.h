@@ -25,7 +25,7 @@ namespace Clustering {
 
         // Accessors & mutators
         int getDims() const { return dim; }     // Inline function to return the dim
-        void setValue(int, double);     // Set a coordinate TODO bounds checking?
+        void setValue(int, double);     // Set a coordinate
         double getValue(int) const;     // Get a coordinate
 
         // Functions
@@ -40,10 +40,13 @@ namespace Clustering {
         const Point operator*(double) const; // prevent (p1*2) = p2;
         const Point operator/(double) const;
 
-        double &operator[](int index) // TODO out-of-bds?
+        double &operator[](int index) //
         {
             if (index >= 1 && index <= dim) {
                 return values[index - 1];
+            }
+            else {
+                std::cout << "That's outside the array" << std::endl;
             }
         }
 

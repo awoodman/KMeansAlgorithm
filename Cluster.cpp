@@ -214,154 +214,140 @@ namespace Clustering {
     //Union
     const Cluster operator+(const Cluster &lhs, const Cluster &rhs) {
         Cluster tempCLuster(lhs);
-        bool add;
 
-        if (tempCLuster.size == 0)
+        if (rhs.size == 0)
+            return tempCLuster;
+        else
         {
-            if (rhs.size == 1)
+            bool add = true;
+            LNodePtr rhsNode = rhs.points;
+            while (rhsNode != nullptr)
             {
-                LNodePtr node = rhs.points;
-                tempCLuster.add(node->p);
-            }
-            else {
-                LNodePtr copyNode = rhs.points;
-                LNodePtr nextCopyNode = copyNode->next;
-
-                do {
-                    tempCLuster.add(copyNode->p);
-                    copyNode = copyNode->next;
-                    nextCopyNode = nextCopyNode->next;
-                } while (nextCopyNode != nullptr);
-            }
-        }
-
-        else if (tempCLuster.size == 1)
-        {
-            if (rhs.size > 1) {
-                LNodePtr tempNode = tempCLuster.points;
-                LNodePtr copyNode = rhs.points;
-                LNodePtr nextCopyNode = copyNode->next;
-
-                do {
-                    if (tempNode->p == copyNode->p)
+                add = true;
+                LNodePtr lhsNode = tempCLuster.points;
+                while (lhsNode != nullptr && (add == true))
+                {
+                    if (lhsNode->p == rhsNode->p) {
                         add = false;
-                    else
-                        add = true;
-
-                    if (add)
-                        tempCLuster.add(copyNode->p);
-
-                    copyNode = copyNode->next;
-                    nextCopyNode = nextCopyNode->next;
-
-                } while (nextCopyNode != nullptr);
-            }
-            else
-            {
-                LNodePtr tempNode = tempCLuster.points;
-                LNodePtr copyNode = rhs.points;
-
-                if (tempNode->p != copyNode->p)
-                    tempCLuster.add(copyNode->p);
-            }
-        }
-
-        else {
-            LNodePtr tempNode = tempCLuster.points;
-            LNodePtr nextTempNode = tempNode->next;
-            LNodePtr copyNode = rhs.points;
-            LNodePtr nextCopyNode = copyNode->next;
-
-            do {
-                do {
-                    if (tempNode->p != copyNode->p) {
-                        tempNode = tempNode->next;
-                        nextTempNode = nextTempNode->next;
+                    }
+                    else {
                         add = true;
                     }
-                    else
-                        add = false;
-                } while (nextTempNode != nullptr && add);
-
-                if (add) {
-                    tempCLuster.add(copyNode->p);
+                    lhsNode = lhsNode->next;
                 }
-                copyNode = copyNode->next;
-                nextCopyNode = nextCopyNode->next;
-            } while (nextCopyNode != nullptr);
+                if (add == true)
+                {
+                    tempCLuster.add(rhsNode->p);
+                }
+                rhsNode = rhsNode->next;
+            }
         }
+
         return tempCLuster;
     }
 
-    //////////////////////////////  LEFT OFF HERE  ///////////////////////////////////
 
     // Intersection
     const Cluster operator-(const Cluster &lhs, const Cluster &rhs) {
+        Cluster tempCluster(lhs);
 
-        bool remove;
-        Cluster result(lhs);
-        LNodePtr lhsNode;
-        LNodePtr rhsNode = rhs.points;
+        if (rhs.size == 0)
+            return tempCluster;
+        else
+        {
+            bool keep = true;
+            LNodePtr tempNode;
+            LNodePtr lhsNode = tempCluster.points;
 
-        while (rhsNode != nullptr) {                       // loop through all points in the right cluster
-            remove = false;
-            lhsNode = lhs.points;
-            while (lhsNode != nullptr) {                     // loop through all points in the left cluster
-                if (lhsNode->p == rhsNode->p) {             // if the point is in both clusters dont remove it
-                    remove = true;
-                    break;
+            while (lhsNode != nullptr)
+            {
+                keep = true;
+                LNodePtr rhsNode = rhs.points;
+
+                while (rhsNode != nullptr && keep)
+                {
+                    if (rhsNode->p == lhsNode->p)
+                    {
+                        keep = false;
+                    }
+                    rhsNode = rhsNode->next;
                 }
-                lhsNode = lhsNode->next;
+                if (!(keep))
+                {
+                    tempNode = lhsNode->next;
+                    tempCluster.remove(lhsNode->p);
+                    lhsNode = tempNode;
+                }
+                if (keep)
+                    lhsNode = lhsNode->next;
             }
-            if (remove == true)                               // if the point wasnt in both clusters remove it.
-                result.remove(rhsNode->p);
-            rhsNode = rhsNode->next;
         }
-        return result;
+        return tempCluster;
     }
 
     Cluster & Cluster::operator+=(const Cluster &rhs) {
-        bool add;
-        LNode *thisNode;
-        LNode *rhsNode = rhs.points;
-
-        while (rhsNode != nullptr) {
-            thisNode = this->points;
-            add = true;
-            while (thisNode != nullptr) {
-                if (thisNode->p == rhsNode->p) {
-                    add=false;
-                    break;
+        if (rhs.size == 0)
+            return *this;
+        else
+        {
+            bool add = true;
+            LNodePtr rhsNode = rhs.points;
+            while (rhsNode != nullptr)
+            {
+                add = true;
+                LNodePtr lhsNode = this->points;
+                while (lhsNode != nullptr && (add == true))
+                {
+                    if (lhsNode->p == rhsNode->p) {
+                        add = false;
+                    }
+                    else {
+                        add = true;
+                    }
+                    lhsNode = lhsNode->next;
                 }
-                thisNode = thisNode->next;
-            }
-            if (add == true) {
-                this->add(rhsNode->p);
+                if (add == true)
+                {
+                    this->add(rhsNode->p);
+                }
                 rhsNode = rhsNode->next;
             }
-
-            return *this;
         }
+
+        return *this;
     }
 
     Cluster & Cluster::operator-=(const Cluster &rhs) {
-        bool remove;
-        LNode *thisNode = this->points;
-        LNode *rhsNode;
+        if (rhs.size == 0)
+            return *this;
+        else
+        {
+            bool keep = true;
+            LNodePtr tempNode;
+            LNodePtr lhsNode = this->points;
 
-        while (thisNode != nullptr) {                       // loop through all points in the left cluster
-            remove = false;
-            rhsNode = rhs.points;
-            while (rhsNode != nullptr) {                  // loop through all points in the right cluster
-                if (thisNode->p == rhsNode->p) {    // if the point is in both clusters remove it
-                    remove = true;
-                    break;
+            while (lhsNode != nullptr)
+            {
+                keep = true;
+                LNodePtr rhsNode = rhs.points;
+
+                while (rhsNode != nullptr && keep)
+                {
+                    if (rhsNode->p == lhsNode->p)
+                    {
+                        keep = false;
+                    }
+                    rhsNode = rhsNode->next;
                 }
-                rhsNode = rhsNode->next;
+                if (!(keep))
+                {
+                    tempNode = lhsNode->next;
+                    this->remove(lhsNode->p);
+                    lhsNode = tempNode;
+                }
+                if (keep)
+                    lhsNode = lhsNode->next;
             }
-            if (remove == true)                               // if the point was in both clusters so remove it.
-                this->remove(thisNode->p);
-            thisNode = thisNode->next;
         }
         return *this;
     }

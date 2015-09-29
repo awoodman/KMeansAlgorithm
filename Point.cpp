@@ -94,7 +94,10 @@ namespace Clustering {
 
     void Point::setValue(int dimension, double coord)     // Set a coordinate
     {
-        values[dimension] = coord;
+        if (dimension > (dim-1))
+            std::cout << "That's outside this array" << std::endl;
+        else
+            values[dimension] = coord;
     }
 
     double Point::getValue(int dimension) const   // Get a coordinate
