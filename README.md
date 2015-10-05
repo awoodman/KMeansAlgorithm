@@ -1,8 +1,6 @@
 # ucd-csi2312-pa2
 Intermediate Programming - Programming Assignment 2
 
-I created a point class and implemented all of the necessary member functions and friend functions in the Point.cpp implementation file.  This allows us to do things like add points together, compare points, etc.
+The first part of the code that will be described is the "Point Class", which is a class consisting of a point in space, with any number of dimensions.  Within the class, there are functions to do things like construct and destruct points, set a point equal to another point, subtract or add points, multiply or divide a point by a number, etc.  Any new points in space should, in general, be created using the point class.  
 
-I then created a cluster class, which is meant to contain points.  The cluster class allows us to do things like add points, subtract points, add other clusters, subtract clusters, etc.  Every point in the cluster(s) are stored in lexicographic order.
-
-The code was not tested yet, because I have not been able to get the cluster << operator to work, yet.
+Next, a cluster class was created, which is meant to contain point objects.  The cluster class allows us to do things like add points, subtract points, add clusters to clusters, subtract clusters from clusters, etc.  Every point in the cluster(s) are stored in lexicographic order.  All points in a cluster must have the same amount of dimensions.  
