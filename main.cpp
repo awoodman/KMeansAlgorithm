@@ -40,8 +40,8 @@ int main() {
 
     p1+=p2;
 
-    std::cout << p1;
-    
+    std::cout << p1 << std::endl;
+
     Point p3(4);
     p1.setValue(1,2);
     p1.setValue(2,3);

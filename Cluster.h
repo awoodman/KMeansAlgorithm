@@ -15,6 +15,7 @@ namespace Clustering {
     struct LNode { // linked-list node
         PointPtr p;
         LNodePtr next;
+        // could add this: LNode(PointPtr pt, LNodePtr n) : p(pt), next(n) {}  // Node Constructor
     };
 
     class Cluster {

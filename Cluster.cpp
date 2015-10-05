@@ -99,6 +99,7 @@ namespace Clustering {
         while (node != nullptr)
         {
             nextNode = node->next;
+//            delete node->p;   // TODO make if statement for whether points still being pointed to...release_pt? (bool)
             delete node;
             node = nextNode;
         }
@@ -115,22 +116,23 @@ namespace Clustering {
         if(size == 0)                                                   // empty cluster, just point to newnode
             this->points = newnode;
         else {
-            while (node != nullptr) {                               // dont walk of the end of the node list
-                if (*newnode->p <= *node->p) {                   // newnode goes before node
-                    if (node == this->points) {              //  newnode will be first node now
+            while (node != nullptr) {                                   // dont walk of the end of the node list
+                if (*newnode->p <= *node->p) {                          // newnode goes before node
+                    if (node == this->points) {                         //  newnode will be first node now
                         newnode->next = this->points;
                         this->points = newnode;
-                    } else {                                //  newnode goes between prevnode and node
+                    }
+                    else {                                              //  newnode goes between prevnode and node
                         newnode->next = prevnode->next;
                         prevnode->next = newnode;
                     }
-                    this->size++;                            // all done, inc size and return
+                    this->size++;                                       // all done, inc size and return
                     return;
                 }
                 prevnode = node;
                 node = node->next;
             }
-            prevnode->next = newnode;                               // newnode is now last node
+            prevnode->next = newnode;                                   // newnode is now last node
         }
         this->size++;
     }
@@ -151,11 +153,11 @@ namespace Clustering {
             }
             else
             {
-                while (node != nullptr && !(remove)) {                   // While not at end of list
-                    prevNode = node;                        // Node before "node"
-                    node = node->next;                      // Go to next node for comparison
+                while (node != nullptr && !(remove)) {                  // While not at end of list
+                    prevNode = node;                                    // Node before "node"
+                    node = node->next;                                  // Go to next node for comparison
                     if (remPoint == node->p) {
-                        prevNode->next = node->next;        // Remove the node
+                        prevNode->next = node->next;                    // Remove the node
                         delete node;
                         remove = true;
                         this->size--;
@@ -175,26 +177,26 @@ namespace Clustering {
 
     const Cluster operator-(const Cluster &lhs, const PointPtr &rhs)
     {
-        Cluster tempCluster(lhs);                           // Copy c into temp
-        tempCluster.remove(rhs);                            // Implement remove()
+        Cluster tempCluster(lhs);                                       // Copy c into temp
+        tempCluster.remove(rhs);                                        // Implement remove()
         return tempCluster;
     }
 
     bool operator==(const Cluster &lhs, const Cluster &rhs)
     {
-        LNodePtr rhsNode = rhs.points;                        // rhsNode is pointer to rhs cluster "points"
-        LNodePtr lhsNode = lhs.points;                        // lhsNode is pointer to lhs cluster "points"
+        LNodePtr rhsNode = rhs.points;                          // rhsNode is pointer to rhs cluster "points"
+        LNodePtr lhsNode = lhs.points;                          // lhsNode is pointer to lhs cluster "points"
         bool decision = true;
 
         //3 Potential Cases
-        if (lhs.size != rhs.size) {                        // If cluster sizes aren't the same
+        if (lhs.size != rhs.size) {                             // If cluster sizes aren't the same
             return false;
         }
-        else if ((lhs.size == 0) && (rhs.size == 0))                            // If both clusters have 0
+        else if ((lhs.size == 0) && (rhs.size == 0))            // If both clusters have 0
         {
             return true;
         }
-        else {                                              // If sizes are greater than 0
+        else {                                                  // If sizes are greater than 0
             while ((rhsNode != nullptr) && (lhsNode != nullptr) && (decision == true))
             {
                 if (lhsNode->p == rhsNode->p)
@@ -359,7 +361,7 @@ namespace Clustering {
         return *this;
     }
 
-    Cluster & Cluster::operator-=(const Point &rhs)         // Removes ONE instance on the point passed
+    Cluster & Cluster::operator-=(const Point &rhs)         // Removes all instances of point passed
     {
         bool found = false;
         if (this->points == nullptr)
@@ -368,20 +370,23 @@ namespace Clustering {
             LNodePtr node = this->points;
             LNodePtr prevNode;
             int i = 1;
-            while (!(found) && node != nullptr) {
-                if (*(node->p) == rhs)
+            while (node != nullptr) {
+                if (*(node->p) == rhs)                  // Call overloaded point comparison operation
                 {
                     if (i == 1)
                         this->points = node->next;
                     if (i > 1)
                         prevNode->next = node->next;
-                    delete node;
+                    delete node; // TODO delete pointptr after this?
+                    node = prevNode->next;
                     found = true;
                     this->size--;
                 }
+                else {
+                    prevNode = node;
+                    node = node->next;
+                }
                 i++;
-                prevNode = node;
-                node = node->next;
             }
         }
         if (!(found))
