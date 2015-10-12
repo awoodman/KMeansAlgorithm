@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <string>
 #include "Point.h"
+#include "Cluster.h"
 #include <fstream>
 #include <sstream>
 #include <algorithm>
@@ -22,6 +23,11 @@ using std::stringstream;
 using std::string;
 
 namespace Clustering {
+// Set Dimensions (for __centroid)
+    void Point::setDims(int desDim)
+    {
+        dim = desDim;
+    }
 
 // Constructors
     Point::Point()
@@ -83,7 +89,7 @@ namespace Clustering {
             values = new double[dim];                       // Allocate new memory
 
             for (int i = 0; i < src.getDims(); i++) {
-                values[i] = src.getValue(i);                // Copy coordinates over
+                values[i] = src.getValue(i+1);                // Copy coordinates over
             }
 
             return *this;                                   // this points to the calling object
@@ -93,7 +99,7 @@ namespace Clustering {
     //Destructor
     // Dynamic allocation for coordinates array, so must deallocate (delete) the memory
     Point::~Point() {
-        delete[] values;
+//        delete[] values;
     }
 
     double Point::distanceTo(const Point &p) const         // Distance to, with any number of dims
@@ -118,7 +124,7 @@ namespace Clustering {
 
     double Point::getValue(int dimension) const   // Get a coordinate
     {
-        return values[dimension];
+        return values[dimension-1];
     }
 
 
@@ -142,7 +148,7 @@ namespace Clustering {
 
         for (int i = 0; i < dim; i++)
         {
-            values[i] = values[i]/denom;
+            values[i] = values[i] / static_cast<double>(denom);
         }
 
         return *this;
@@ -168,25 +174,28 @@ namespace Clustering {
 
     const Point Point::operator/(double denom) const
     {
-        Point product(this->getDims());
+        PointPtr quotient;
+        quotient = new Point(this->getDims());
 
         if (denom == 0) {
             std::cout << "Cannot divide by zero" << std::endl;
             return *this;
         }
 
-        for (int i = 0; i < this->getDims(); i++)
-        {
-            product.setValue(i,this->getValue(i));
-        }
-
-        for (int i = 0; i < this->getDims(); i++)
+//        *quotient = *this;
+        for (int i = 1; i < (this->getDims() + 1); i++)
         {
 
-            product.setValue(i,(product.getValue(i))/denom);
+            quotient->setValue(i,this->getValue(i));
         }
 
-        return product;
+        for (int i = 1; i < (this->getDims() + 1); i++)
+        {
+
+            quotient->setValue(i,(quotient->getValue(i))/denom);
+        }
+
+        return *quotient;
     }
 
     Point &operator+=(Point & dst, const Point & src)
@@ -344,20 +353,15 @@ namespace Clustering {
         }
 
         outputStream << rhs.values[index + 1];
-        outputStream << " : " << std::endl;
+        outputStream << " : ";
 
         return outputStream;
     }
 
     std::istream &operator>>(std::istream & inputStream, Point & destPoint)
     {
-        // Should only read in one point at a time
-        //string line;
         static const char DELIM = ',';
 
-        //getline(inputStream,line);
-
-        //stringstream lineStream(line);
         string value;
         double d;
 

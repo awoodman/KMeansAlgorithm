@@ -21,8 +21,9 @@ namespace Clustering {
     class Cluster {
         int size;
         LNodePtr points;                        // linked-list head (points to first node)
-        bool __release_points;
+        bool __release_points = false;
         unsigned int __id;
+        Point __centroid;
 
     public:
         // Set the ID
@@ -37,6 +38,11 @@ namespace Clustering {
 
         // ID Getter
         int getID() const { return __id; }
+
+//        // Centroid Operations
+        void setCentroid(const Point &);
+        const Point getCentroid();
+        void computeCentroid();
 
         // Set functions: They allow calling c1.add(c2.remove(p));
         void add(const PointPtr &);

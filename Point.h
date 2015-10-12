@@ -25,6 +25,7 @@ namespace Clustering {
 
         // Accessors & mutators
         int getDims() const { return dim; }     // Inline function to return the dim
+        void setDims(int);
         void setValue(int, double);     // Set a coordinate
         double getValue(int) const;     // Get a coordinate
 

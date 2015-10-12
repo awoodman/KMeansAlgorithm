@@ -27,6 +27,33 @@ namespace Clustering {
         __id = id++;
     }
 
+    // Centroid operations
+    void Cluster::setCentroid(const Point & tempPt)
+    {
+        __centroid = tempPt;
+    }
+
+    const Point Cluster::getCentroid()
+    {
+        return __centroid;
+    }
+
+    void Cluster::computeCentroid()
+    {
+        int dims = this->points->p->getDims();
+        Point p(dims);
+        LNodePtr currNode = this->points;
+
+        while (currNode != nullptr)
+        {
+
+            p += *(currNode->p);
+            currNode = currNode->next;
+        }
+
+        p /= this->size;
+        this->setCentroid(p);
+    }
 
     //Copy Constructor
     Cluster::Cluster(const Cluster & src)
@@ -443,7 +470,9 @@ namespace Clustering {
         while (currNode != nullptr)
         {
             outputStream << *(currNode->p);
-            outputStream << srcCluster.getID();
+            outputStream << srcCluster.getID() << endl;
+
+            currNode = currNode->next;
         }
 
         return outputStream;
