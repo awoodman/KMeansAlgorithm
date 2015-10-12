@@ -3,12 +3,35 @@
 //
 
 #include "Cluster.h"
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+
+// iostream
+using std::cout;
+using std::endl;
+
+// fstream
+using std::ifstream;
+
+// sstream
+using std::stringstream;
+using std::string;
 
 namespace Clustering {
+
+    void Cluster::generateID()
+    {
+        static int id = 1;
+        __id = id++;
+    }
+
 
     //Copy Constructor
     Cluster::Cluster(const Cluster & src)
     {
+        this->generateID();
         if (src.points == nullptr)
         {
             this->size = 0;
@@ -99,7 +122,6 @@ namespace Clustering {
         while (node != nullptr)
         {
             nextNode = node->next;
-//            delete node->p;   // TODO make if statement for whether points still being pointed to...release_pt? (bool)
             delete node;
             node = nextNode;
         }
@@ -377,7 +399,7 @@ namespace Clustering {
                         this->points = node->next;
                     if (i > 1)
                         prevNode->next = node->next;
-                    delete node; // TODO delete pointptr after this?
+                    delete node; // TODO delete pointptr before this?
                     node = prevNode->next;
                     found = true;
                     this->size--;
@@ -393,6 +415,38 @@ namespace Clustering {
             std::cout << "Could not find this point in the cluster" << std::endl;
 
         return *this;
+    }
+
+    std::istream &operator>>(std::istream & inputStream, Cluster & destCluster)
+    {
+        string line;
+        static const char DELIM = ',';
+
+        while (getline(inputStream,line)) {                                 // While '\n' not yet reached (takes in whole line)
+            size_t pdim = std::count(line.begin(), line.end(), DELIM) + 1;  // Count the delimiters
+
+            PointPtr p;
+            p = new Point(pdim);
+
+            stringstream lineStream(line);
+
+            lineStream >> *p;
+
+            destCluster.add(p);
+        }
+    }
+
+    std::ostream &operator<<(std::ostream & outputStream, Cluster & srcCluster)
+    {
+        LNodePtr currNode = srcCluster.points;
+
+        while (currNode != nullptr)
+        {
+            outputStream << *(currNode->p);
+            outputStream << srcCluster.getID();
+        }
+
+        return outputStream;
     }
 
 }

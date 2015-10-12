@@ -3,7 +3,23 @@
 //
 
 #include <cmath>
+#include <cstdlib>
+#include <string>
 #include "Point.h"
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+
+// iostream
+using std::cout;
+using std::endl;
+
+// fstream
+using std::ifstream;
+
+// sstream
+using std::stringstream;
+using std::string;
 
 namespace Clustering {
 
@@ -94,10 +110,10 @@ namespace Clustering {
 
     void Point::setValue(int dimension, double coord)     // Set a coordinate
     {
-        if (dimension > (dim-1))
+        if (dimension > (dim))
             std::cout << "That's outside this array" << std::endl;
         else
-            values[dimension] = coord;
+            values[dimension-1] = coord;
     }
 
     double Point::getValue(int dimension) const   // Get a coordinate
@@ -319,11 +335,37 @@ namespace Clustering {
 
     std::ostream &operator<<(std::ostream & outputStream, const Point & rhs)
     {
-        for (int i = 0; i < rhs.dim; i++)
+        int index;
+
+        for (int i = 0; i < rhs.dim - 1; i++)
         {
-            outputStream << rhs.values[i] << " ";
+            outputStream << rhs.values[i] << ", ";
+            index = i;
         }
 
+        outputStream << rhs.values[index + 1];
+        outputStream << " : " << std::endl;
+
         return outputStream;
+    }
+
+    std::istream &operator>>(std::istream & inputStream, Point & destPoint)
+    {
+        // Should only read in one point at a time
+        //string line;
+        static const char DELIM = ',';
+
+        //getline(inputStream,line);
+
+        //stringstream lineStream(line);
+        string value;
+        double d;
+
+        int i = 1;
+        while (getline(inputStream, value, DELIM)) {     // While delimiter (',') not yet reached
+            d = atof(value.c_str());                    // Convert string to double
+            destPoint.setValue(i++, d);                         // Post-inc 'i'
+        }
+
     }
 }

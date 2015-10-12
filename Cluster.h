@@ -15,20 +15,28 @@ namespace Clustering {
     struct LNode { // linked-list node
         PointPtr p;
         LNodePtr next;
-        // could add this: LNode(PointPtr pt, LNodePtr n) : p(pt), next(n) {}  // Node Constructor
+                            // could add this: LNode(PointPtr pt, LNodePtr n) : p(pt), next(n) {}  // Node Constructor
     };
 
     class Cluster {
         int size;
-        LNodePtr points; // linked-list head (points to first node)
+        LNodePtr points;                        // linked-list head (points to first node)
+        bool __release_points;
+        unsigned int __id;
 
     public:
-        Cluster() : size(0), points(nullptr) {};
+        // Set the ID
+        void generateID();
+
+        Cluster() : size(0), points(nullptr) { generateID(); };
 
         // The big three: cpy constructor, overloaded operator=, destructor
         Cluster(const Cluster &);
         Cluster &operator=(const Cluster &);
         ~Cluster();
+
+        // ID Getter
+        int getID() const { return __id; }
 
         // Set functions: They allow calling c1.add(c2.remove(p));
         void add(const PointPtr &);
@@ -56,8 +64,8 @@ namespace Clustering {
         friend const Cluster operator-(const Cluster &lhs, const PointPtr &rhs);
 
 //         IO
-//        friend std::ostream &operator<<(std::ostream &, Cluster &);
-//        friend std::istream &operator>>(std::istream &, Cluster &);
+        friend std::ostream &operator<<(std::ostream &, Cluster &);
+        friend std::istream &operator>>(std::istream &, Cluster &);
 
     };
 }
