@@ -512,33 +512,18 @@ namespace Clustering {
         return outputStream;
     }
 
-
-    // Inner Move Class functions
-    Cluster::Move::Move(PointPtr &ptr, const Cluster &from, Cluster &to)
-    {
-        point = ptr;
-        this->from = from;
-        this->to = to;
-    }
-
-    void Cluster::Move::perform()
-    {
-        to.add(from.remove(point));
-        to.invalidateCentroid();
-        from.invalidateCentroid();
-    }
-
-    void Cluster::Move::pickPoints(int k, PointPtr pointArray)
+    // Picking Centroids, etc.
+    void Cluster::pickPoints(int k, PointPtr pointArray)
     {
 
     }
 
-    int Cluster::Move::getSize()
+    int Cluster::getSize()
     {
 
     }
 
-    double Cluster::Move::interClusterDistance() const
+    double Cluster::interClusterDistance() const
     {
 
     }
@@ -548,8 +533,22 @@ namespace Clustering {
 
     }
 
-    int Cluster::Move::getClusterEdges()
+    int Cluster::getClusterEdges()
     {
 
     }
+
+    // Inner Move Class functions
+    Cluster::Move::Move(PointPtr &ptr, const Cluster &from_set, Cluster &to_set)
+    {
+        point = ptr;
+        *this->from = from_set;
+        *this->to = to_set;
+    }
+
+    void Cluster::Move::perform()
+    {
+        to->add(from->remove(point));
+    }
+
 }

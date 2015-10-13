@@ -2,6 +2,7 @@
 
 #include "Point.h"
 #include "Cluster.h"
+#include "KMeans.h"
 #include <fstream>
 #include <iostream>
 
@@ -114,17 +115,19 @@ int main() {
 //    outfile << p6;
 //    outfile.close();
 
-    std::ifstream csv("points.txt");
-    Cluster pointSpace;
-    csv >> pointSpace;
+//    std::ifstream csv("points.txt");
+//    Cluster pointSpace;
+//    csv >> pointSpace;
+//
+//    pointSpace.computeCentroid();
+//
+//    csv.close();
+//
+//    std::ofstream outfile("outputCLust.txt");
+//    outfile << pointSpace;
+//    outfile.close();
 
-    pointSpace.computeCentroid();
-
-    csv.close();
-
-    std::ofstream outfile("outputCLust.txt");
-    outfile << pointSpace;
-    outfile.close();
+    KMeans testAlg;
 
     return 0;
 }

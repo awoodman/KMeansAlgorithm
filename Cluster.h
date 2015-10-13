@@ -12,7 +12,7 @@ namespace Clustering {
     typedef Point *PointPtr;                    // Pointer to a point (goes inside node)
     typedef struct LNode *LNodePtr;             // Pointer to an LNode
 
-    struct LNode { // linked-list node
+    struct LNode {                              // linked-list node
         PointPtr p;
         LNodePtr next;
                             // could add this: LNode(PointPtr pt, LNodePtr n) : p(pt), next(n) {}  // Node Constructor
@@ -44,11 +44,22 @@ namespace Clustering {
         // Dimensionality Setter
         void setDimensionality(const int);
 
-//        // Centroid Operations
+        // Centroid Operations
         void setCentroid(const Point &);
         void invalidateCentroid();
         const Point getCentroid();
         void computeCentroid();
+
+        //9 - 11 Instructions Functions
+        void pickPoints(int k, PointPtr pointArray);
+        int getSize();
+        double interClusterDistance() const;
+        friend double intraClusterDistance(const Cluster &, const Cluster &);
+        int getClusterEdges();
+
+        // Release Point t/f
+        void rpTrue() {__release_points = true; }
+        void rpFalse() {__release_points = false; }
 
         // Set functions: They allow calling c1.add(c2.remove(p));
         void add(const PointPtr &);
@@ -81,16 +92,12 @@ namespace Clustering {
 
         class Move {
         private:
-            Cluster from, to;
+            Cluster* from;
+            Cluster* to;
             PointPtr point;
         public:
             Move(PointPtr &, const Cluster &, Cluster &);
             void perform();
-            void pickPoints(int k, PointPtr pointArray);
-            int getSize();
-            double interClusterDistance() const;
-            friend double intraClusterDistance(const Cluster &, const Cluster &);
-            int getClusterEdges();
         };
     };
 }
