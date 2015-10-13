@@ -20,16 +20,18 @@ namespace Clustering {
 
     class Cluster {
         int size;
+        int __dimensionality;
         LNodePtr points;                        // linked-list head (points to first node)
         bool __release_points = false;
         unsigned int __id;
-        Point __centroid;
+        PointPtr __centroid;
+        bool __valid_centroid;
 
     public:
         // Set the ID
         void generateID();
 
-        Cluster() : size(0), points(nullptr) { generateID(); };
+        Cluster() : size(0), points(nullptr), __dimensionality(0), __valid_centroid(false), __centroid(nullptr) { generateID(); };
 
         // The big three: cpy constructor, overloaded operator=, destructor
         Cluster(const Cluster &);
@@ -39,8 +41,12 @@ namespace Clustering {
         // ID Getter
         int getID() const { return __id; }
 
+        // Dimensionality Setter
+        void setDimensionality(const int);
+
 //        // Centroid Operations
         void setCentroid(const Point &);
+        void invalidateCentroid();
         const Point getCentroid();
         void computeCentroid();
 
@@ -73,6 +79,19 @@ namespace Clustering {
         friend std::ostream &operator<<(std::ostream &, Cluster &);
         friend std::istream &operator>>(std::istream &, Cluster &);
 
+        class Move {
+        private:
+            Cluster from, to;
+            PointPtr point;
+        public:
+            Move(PointPtr &, const Cluster &, Cluster &);
+            void perform();
+            void pickPoints(int k, PointPtr pointArray);
+            int getSize();
+            double interClusterDistance() const;
+            friend double intraClusterDistance(const Cluster &, const Cluster &);
+            int getClusterEdges();
+        };
     };
 }
 #endif //CLUSTERING_CLUSTER_H

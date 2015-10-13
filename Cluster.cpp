@@ -27,37 +27,53 @@ namespace Clustering {
         __id = id++;
     }
 
+    void Cluster::setDimensionality(const int dimens)
+    {
+        __dimensionality = dimens;
+    }
+
     // Centroid operations
     void Cluster::setCentroid(const Point & tempPt)
     {
-        __centroid = tempPt;
+        __centroid = new Point(tempPt.getDims());
+        *__centroid = tempPt;
+        __valid_centroid = true;
+    }
+
+    void Cluster::invalidateCentroid()
+    {
+        __valid_centroid = false;
     }
 
     const Point Cluster::getCentroid()
     {
-        return __centroid;
+        return *__centroid;
     }
 
     void Cluster::computeCentroid()
     {
-        int dims = this->points->p->getDims();
-        Point p(dims);
+        Point p(this->points->p->getDims());
         LNodePtr currNode = this->points;
 
+        currNode = this->points;
         while (currNode != nullptr)
         {
-
-            p += *(currNode->p);
+            p += *(currNode->p)/(this->size);
             currNode = currNode->next;
         }
 
-        p /= this->size;
         this->setCentroid(p);
+
+        __valid_centroid = true;
     }
 
     //Copy Constructor
     Cluster::Cluster(const Cluster & src)
     {
+        this->__dimensionality = src.__dimensionality;
+
+        __centroid = nullptr;
+
         this->generateID();
         if (src.points == nullptr)
         {
@@ -156,6 +172,8 @@ namespace Clustering {
 
     void Cluster::add(const PointPtr & newPoint)
     {
+        this->setDimensionality(newPoint->getDims());
+
         LNode *node = this->points;
         LNodePtr prevnode;
         LNodePtr newnode = new LNode;
@@ -184,6 +202,8 @@ namespace Clustering {
             prevnode->next = newnode;                                   // newnode is now last node
         }
         this->size++;
+
+        this->invalidateCentroid();
     }
 
     const PointPtr & Cluster::remove(const PointPtr & remPoint)
@@ -214,12 +234,15 @@ namespace Clustering {
                 }
             }
         }
+        this->invalidateCentroid();
+
         return remPoint;
+
     }
 
     const Cluster operator+(const Cluster &lhs, const PointPtr &rhs)
     {
-        Cluster tempCluster(lhs);                           //Create temporary cluster to return, copying from lhs
+        Cluster tempCluster(lhs);                           // Create temporary cluster to return, copying from lhs
         tempCluster.add(rhs);                               // Implement add()
         return tempCluster;
     }
@@ -333,6 +356,7 @@ namespace Clustering {
                     lhsNode = lhsNode->next;
             }
         }
+
         return tempCluster;
     }
 
@@ -365,6 +389,7 @@ namespace Clustering {
             }
         }
 
+        this->__valid_centroid = false;       // Invalidate Centroid
         return *this;
     }
 
@@ -400,6 +425,8 @@ namespace Clustering {
                     lhsNode = lhsNode->next;
             }
         }
+
+        this->__valid_centroid = false;       // Invalidate Centroid
         return *this;
     }
 
@@ -407,6 +434,9 @@ namespace Clustering {
     {
         PointPtr newPoint = new Point(rhs);
         this->add(newPoint);
+
+        this->__valid_centroid = false;       // Invalidate Centroid
+
         return *this;
     }
 
@@ -440,6 +470,8 @@ namespace Clustering {
         }
         if (!(found))
             std::cout << "Could not find this point in the cluster" << std::endl;
+        else
+            this->__valid_centroid = false;       // Invalidate Centroid
 
         return *this;
     }
@@ -451,6 +483,8 @@ namespace Clustering {
 
         while (getline(inputStream,line)) {                                 // While '\n' not yet reached (takes in whole line)
             size_t pdim = std::count(line.begin(), line.end(), DELIM) + 1;  // Count the delimiters
+
+            destCluster.setDimensionality(pdim);
 
             PointPtr p;
             p = new Point(pdim);
@@ -478,4 +512,44 @@ namespace Clustering {
         return outputStream;
     }
 
+
+    // Inner Move Class functions
+    Cluster::Move::Move(PointPtr &ptr, const Cluster &from, Cluster &to)
+    {
+        point = ptr;
+        this->from = from;
+        this->to = to;
+    }
+
+    void Cluster::Move::perform()
+    {
+        to.add(from.remove(point));
+        to.invalidateCentroid();
+        from.invalidateCentroid();
+    }
+
+    void Cluster::Move::pickPoints(int k, PointPtr pointArray)
+    {
+
+    }
+
+    int Cluster::Move::getSize()
+    {
+
+    }
+
+    double Cluster::Move::interClusterDistance() const
+    {
+
+    }
+
+    double intraClusterDistance(const Cluster &, const Cluster &)
+    {
+
+    }
+
+    int Cluster::Move::getClusterEdges()
+    {
+
+    }
 }

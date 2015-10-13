@@ -30,10 +30,6 @@ namespace Clustering {
     }
 
 // Constructors
-    Point::Point()
-    {
-        std::cout << "There is no default constructor in place.  Sorry!" << std::endl;
-    }
 
     Point::Point(int dimension)     // Constructor to set all coordinates to 0
     {
@@ -66,8 +62,8 @@ namespace Clustering {
 
             values = new double[dim];                       // Allocate new memory
 
-            for (int i = 0; i < src.getDims(); i++) {
-                values[i] = src.getValue(i);                // Copy coordinates over
+            for (int i = 1; i < (src.getDims()+1); i++) {
+                values[i-1] = src.getValue(i);                // Copy coordinates over
             }
         }
         else {
@@ -99,7 +95,7 @@ namespace Clustering {
     //Destructor
     // Dynamic allocation for coordinates array, so must deallocate (delete) the memory
     Point::~Point() {
-//        delete[] values;
+        delete[] values;
     }
 
     double Point::distanceTo(const Point &p) const         // Distance to, with any number of dims
@@ -174,22 +170,21 @@ namespace Clustering {
 
     const Point Point::operator/(double denom) const
     {
-        PointPtr quotient;
-        quotient = new Point(this->getDims());
-
         if (denom == 0) {
             std::cout << "Cannot divide by zero" << std::endl;
             return *this;
         }
 
-//        *quotient = *this;
-        for (int i = 1; i < (this->getDims() + 1); i++)
+        PointPtr quotient;
+        quotient = new Point(this->getDims());
+
+        for (int i = 1; i < ((this->getDims())+1); i++)
         {
 
             quotient->setValue(i,this->getValue(i));
         }
 
-        for (int i = 1; i < (this->getDims() + 1); i++)
+        for (int i = 1; i < ((this->getDims())+1); i++)
         {
 
             quotient->setValue(i,(quotient->getValue(i))/denom);

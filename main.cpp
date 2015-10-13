@@ -83,6 +83,8 @@ int main() {
 //
 //    c2 = c2 - Point2;
 //    c1.add(&p3);
+//    c1.remove(&p3);
+//    c1.computeCentroid();
 //
 //    Cluster c5 = c1 - c3;
 //
@@ -118,12 +120,11 @@ int main() {
 
     pointSpace.computeCentroid();
 
-//    csv.close();
-//
-//    std::ofstream outfile("outputCLust.txt");
-//    outfile << c5;
-//    outfile << pointSpace;
-//    outfile.close();
+    csv.close();
+
+    std::ofstream outfile("outputCLust.txt");
+    outfile << pointSpace;
+    outfile.close();
 
     return 0;
 }
