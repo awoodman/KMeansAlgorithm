@@ -51,7 +51,7 @@ namespace Clustering {
         void computeCentroid();
 
         //9 - 11 Instructions Functions
-        void pickPoints(int k, PointPtr pointArray);
+        void pickPoints(int k, PointPtr *pointArray);
         int getSize();
         double interClusterDistance() const;
         friend double intraClusterDistance(const Cluster &, const Cluster &);

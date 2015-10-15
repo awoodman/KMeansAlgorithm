@@ -513,14 +513,25 @@ namespace Clustering {
     }
 
     // Picking Centroids, etc.
-    void Cluster::pickPoints(int k, PointPtr pointArray)
+    void Cluster::pickPoints(int k, PointPtr *pointArray)
     {
+        LNodePtr currNode = this->points;
+        int increment = (this->size)/k;
 
+        // populate pointArray with 'k' pointptr's;
+        currNode = currNode->next; // Don't pick first point (start w second)
+
+        for (int i = 0; i < k; i++)
+        {
+            pointArray[i] = currNode->p;
+            for (int l = 0; l < increment; l++)
+                currNode = currNode->next;
+        }
     }
 
     int Cluster::getSize()
     {
-
+        return size;
     }
 
     double Cluster::interClusterDistance() const
