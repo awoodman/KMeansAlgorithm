@@ -122,10 +122,7 @@ int main() {
 //    pointSpace.computeCentroid();
 //
 //    csv.close();
-//
-//    std::ofstream outfile("outputCLust.txt");
-//    outfile << pointSpace;
-//    outfile.close();
+
 //
 //    Cluster c4;
 //    c4.add(&p1);
