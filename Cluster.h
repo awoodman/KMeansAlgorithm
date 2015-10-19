@@ -38,6 +38,9 @@ namespace Clustering {
         Cluster &operator=(const Cluster &);
         ~Cluster();
 
+        // Point Getter
+        PointPtr getPoint(int);
+
         // ID Getter
         int getID() const { return __id; }
 
@@ -50,11 +53,19 @@ namespace Clustering {
         const Point getCentroid();
         void computeCentroid();
 
+        bool validCentroid()
+        {
+            if (__valid_centroid)
+                return true;
+            else
+                return false;
+        }
+
         //9 - 11 Instructions Functions
         void pickPoints(int k, PointPtr *pointArray);
         int getSize();
-        double interClusterDistance() const;
-        friend double intraClusterDistance(const Cluster &, const Cluster &);
+        double intraClusterDistance() const;
+        friend double interClusterDistance(const Cluster &, const Cluster &);
         int getClusterEdges();
 
         // Release Point t/f
@@ -96,8 +107,16 @@ namespace Clustering {
             Cluster* to;
             PointPtr point;
         public:
-            Move(PointPtr &, const Cluster &, Cluster &);
-            void perform();
+            Move(const PointPtr ptr, Cluster * from_set, Cluster * to_set)
+            {
+                point = ptr;
+                this->from = from_set;
+                this->to = to_set;
+            }
+            void perform()
+            {
+                to->add(from->remove(point));
+            }
         };
     };
 }

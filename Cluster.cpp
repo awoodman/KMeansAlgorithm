@@ -519,8 +519,6 @@ namespace Clustering {
         int increment = (this->size)/k;
 
         // populate pointArray with 'k' pointptr's;
-        currNode = currNode->next; // Don't pick first point (start w second)
-
         for (int i = 0; i < k; i++)
         {
             pointArray[i] = currNode->p;
@@ -534,32 +532,67 @@ namespace Clustering {
         return size;
     }
 
-    double Cluster::interClusterDistance() const
+    double Cluster::intraClusterDistance() const
     {
+        LNodePtr currNode1 = this->points;
+        LNodePtr currNode2 = this->points;
+        double totalDist = 0;
 
+        while (currNode1 != nullptr) {
+            while (currNode2 != nullptr) {
+                if (currNode1->p != currNode2->p) {
+                    totalDist = totalDist + currNode1->p->distanceTo(*currNode2->p);
+                }
+                currNode2 = currNode2->next;
+            }
+            currNode2 = this->points;
+            currNode1 = currNode1->next;
+        }
+
+        return totalDist/2.0;
     }
 
-    double intraClusterDistance(const Cluster &, const Cluster &)
+    double interClusterDistance(const Cluster & c1, const Cluster & c2)
     {
+        LNodePtr currNode1 = c1.points;
+        LNodePtr currNode2 = c2.points;
+        double totalDist = 0;
 
+        while (currNode1 != nullptr) {
+            while (currNode2 != nullptr) {
+                if (currNode1 != currNode2) {
+                    totalDist = totalDist + currNode1->p->distanceTo(*currNode2->p);
+                }
+                currNode2 = currNode2->next;
+            }
+            currNode2 = c2.points;
+            currNode1 = currNode1->next;
+        }
+
+        return totalDist;
     }
 
     int Cluster::getClusterEdges()
     {
-
+        return size*(size-1)/2;
     }
 
-    // Inner Move Class functions
-    Cluster::Move::Move(PointPtr &ptr, const Cluster &from_set, Cluster &to_set)
+    // get Point
+    PointPtr Cluster::getPoint(int index) // Takes index for point it returns
     {
-        point = ptr;
-        *this->from = from_set;
-        *this->to = to_set;
-    }
-
-    void Cluster::Move::perform()
-    {
-        to->add(from->remove(point));
+        LNodePtr node = points;
+        if (index == 0)
+            return node->p;
+        else
+        {
+            int i = 0;
+            while (i < index)
+            {
+                node = node->next;
+                i++;
+            }
+            return node->p;
+        }
     }
 
 }

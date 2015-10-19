@@ -126,6 +126,17 @@ int main() {
 //    std::ofstream outfile("outputCLust.txt");
 //    outfile << pointSpace;
 //    outfile.close();
+//
+//    Cluster c4;
+//    c4.add(&p1);
+//    c4.add(&p2);
+
+//    Cluster c5;
+//    c5.add(&p3);
+//    c5.add(&p4);
+//    std::cout << "IntraCluster Distance: " << c4.intraClusterDistance() << std::endl;
+//    std::cout << interClusterDistance(c4,c5) << std::endl;
+//    std::cout << c4.getClusterEdges();
 
     KMeans testAlg;
 
