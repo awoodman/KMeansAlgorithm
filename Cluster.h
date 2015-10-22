@@ -22,7 +22,6 @@ namespace Clustering {
         int size;
         int __dimensionality;
         LNodePtr points;                        // linked-list head (points to first node)
-        bool __release_points = false;
         unsigned int __id;
         PointPtr __centroid;
         bool __valid_centroid;
@@ -63,14 +62,13 @@ namespace Clustering {
 
         //9 - 11 Instructions Functions
         void pickPoints(int k, PointPtr *pointArray);
-        int getSize();
-        double intraClusterDistance() const;
-        friend double interClusterDistance(const Cluster &, const Cluster &);
-        int getClusterEdges();
+        int getSize() const;
 
-        // Release Point t/f
-        void rpTrue() {__release_points = true; }
-        void rpFalse() {__release_points = false; }
+        // Cluster Distance Functions
+        double intraClusterDistance() const;    // inside the cluster
+        friend double interClusterDistance(const Cluster &, const Cluster &);   // between clusters
+        int getClusterEdges();
+        friend double interClusterEdges(const Cluster &c1, const Cluster &c2);
 
         // Set functions: They allow calling c1.add(c2.remove(p));
         void add(const PointPtr &);

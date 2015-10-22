@@ -1,10 +1,7 @@
 #include <iostream>
 
 #include "Point.h"
-#include "Cluster.h"
 #include "KMeans.h"
-#include <fstream>
-#include <iostream>
 
 // TESTING THE PUSH COMMAND WITH TAGS (THIS SHOULD CHANGE PA2-1.0)
 using namespace Clustering;

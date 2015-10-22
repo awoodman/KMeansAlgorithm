@@ -3,9 +3,8 @@
 //
 
 #include "KMeans.h"
-#include "Point.h"
-#include "Cluster.h"
 #include <fstream>
+#include <cmath>
 
 namespace Clustering {
 
@@ -13,13 +12,12 @@ namespace Clustering {
     {
         // Set member variables
         k = 5;                          // Arbitrary # of clusters
-        double score;
+        double score, prevScore;
         double scoreDiff = SCORE_DIFF_THRESHOLD + 1;
 
         // Initializing Algorithm
         std::ifstream csv("points.txt");
         Cluster* pointSpace = new Cluster;
-        pointSpace->rpTrue();
         csv >> *pointSpace;
         point_space = pointSpace;
         initCentroids = new PointPtr[k];
@@ -35,15 +33,14 @@ namespace Clustering {
         {
             Cluster* newCluster = new Cluster;
             newCluster->setCentroid(*initCentroids[i]);
-            newCluster->rpFalse();                  // set release points to false
             newCluster->validCentroid();
             clusterArray[i] = newCluster;
         }
 
 //        KMeans Algorithm
-//        while (scoreDiff > SCORE_DIFF_THRESHOLD)            // loop until diff < diffThreshold
-        for (int i = 0; i < 50; i++) // TODO: change to the above while condition
+        while (scoreDiff > SCORE_DIFF_THRESHOLD)            // loop until diff < diffThreshold
         {
+            static int iter = 0;
             for (int i = 0; i < k; i++)                     // loop thru all clusters
             {
                 int clustSize = clusterArray[i]->getSize();
@@ -66,11 +63,22 @@ namespace Clustering {
                     }
                 }
             }
+
             for (int m = 0; m < k; m++)                     // loop thru all clusters to recompute centroid
             {
                 if (!(clusterArray[m]->validCentroid()))
                     clusterArray[m]->computeCentroid();
             }
+
+            prevScore = score;
+
+            // Compute new Clustering Score
+            score = computeClusteringScore();
+
+            scoreDiff = fabs(score - prevScore);
+
+            std::cout << "Iteration: " << ++iter << std::endl;
+            std::cout << "Score: " << score << std::endl;
         }
 
         // Print all clusters
@@ -81,10 +89,66 @@ namespace Clustering {
         }
         outfile.close();
 
+
+        // Clean up memory
+        for (int n = 0; n < k; n++)
+        {
+            int size = clusterArray[n]->getSize();
+
+            for (int i = 0; i < size; i++) {
+                delete clusterArray[n]->getPoint(i);    // delete all points in each cluster
+            }
+
+            //TODO: delete nodes within cluster
+
+            delete clusterArray[n];     // delete 'k' dynamic clusters
+        }
+        delete [] clusterArray;            // delete dynamic cluster array
     }
+
 
     double KMeans::computeClusteringScore()
     {
+        double BetaCV = 0, Din = 0, Dout = 0;
 
+        // Compute Din
+        for (int i = 0; i < k; i++)
+        {
+            Din = Din + clusterArray[i]->intraClusterDistance();
+        }
+
+        // Compute Dout
+        for (int j = 0; j < k; j++)
+        {
+            for (int l = 0; l < k; l++)
+            {
+                if (j != l) {                           // Don't add distance between itself
+                    Cluster c1 = *clusterArray[l];
+                    Cluster c2 = *clusterArray[j];
+                    Dout = Dout + interClusterDistance(c1, c2);
+                }
+            }
+        }
+
+        // Compute Pin
+        int Pin = 0;
+        for (int m = 0; m < k; m++)
+        {
+            Pin = Pin + clusterArray[m]->getClusterEdges();
+        }
+
+        // Compute Pout
+        int Pout = 0;
+        for (int n = 0; n < k; n++)
+        {
+            for (int o = n + 1; o < (k - 1); o++)
+            {
+                Pout = Pout + interClusterEdges(*clusterArray[n],*clusterArray[o]);
+            }
+        }
+
+        BetaCV = (Din / Pin) / (Dout / Pout);
+
+        return BetaCV;
     }
 }

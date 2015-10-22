@@ -3,7 +3,6 @@
 //
 
 #include "Cluster.h"
-#include <string>
 #include <fstream>
 #include <sstream>
 #include <algorithm>
@@ -527,7 +526,7 @@ namespace Clustering {
         }
     }
 
-    int Cluster::getSize()
+    int Cluster::getSize() const
     {
         return size;
     }
@@ -575,6 +574,13 @@ namespace Clustering {
     int Cluster::getClusterEdges()
     {
         return size*(size-1)/2;
+    }
+
+    double interClusterEdges(const Cluster &c1, const Cluster &c2)
+    {
+        int edges = c1.getSize()*c2.getSize();
+
+        return edges;
     }
 
     // get Point

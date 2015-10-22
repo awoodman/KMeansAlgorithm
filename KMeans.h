@@ -16,10 +16,8 @@ namespace Clustering {
         int k;                                // Number of Clusters
         PointPtr *initCentroids;                  // Initial centroid array (to be populated w. pickPoints)
     public:
-        static constexpr double SCORE_DIFF_THRESHOLD = 0.1;         // Termination condition for outer loop of iterative algorithm
-
+        static constexpr double SCORE_DIFF_THRESHOLD = 0.0001;         // Termination condition for outer loop of iterative algorithm
         KMeans();                                   // Default Constructor
-
         double computeClusteringScore();
     };
 }
