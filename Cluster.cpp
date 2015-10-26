@@ -481,12 +481,12 @@ namespace Clustering {
         static const char DELIM = ',';
 
         while (getline(inputStream,line)) {                                 // While '\n' not yet reached (takes in whole line)
-            size_t pdim = std::count(line.begin(), line.end(), DELIM) + 1;  // Count the delimiters
-
-            destCluster.setDimensionality(pdim);
+//            size_t pdim = std::count(line.begin(), line.end(), DELIM) + 1;  // Count the delimiters
+//
+//            destCluster.setDimensionality(pdim);                            // Set cluster dims as pdim
 
             PointPtr p;
-            p = new Point(pdim);
+            p = new Point(destCluster.__dimensionality);
 
             stringstream lineStream(line);
 
