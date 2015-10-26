@@ -20,6 +20,7 @@ namespace Clustering {
         static constexpr double SCORE_DIFF_THRESHOLD = 0.001;         // Termination condition for outer loop of iterative algorithm
         KMeans();                                   // Default Constructor
         KMeans(int,int);
+        ~KMeans();
         double computeClusteringScore();
     };
 }

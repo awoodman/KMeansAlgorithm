@@ -132,7 +132,7 @@ int main() {
 //    std::cout << interClusterDistance(c4,c5) << std::endl;
 //    std::cout << c4.getClusterEdges();
 
-    KMeans testAlg;
+    KMeans testAlg(5,3);
 
     return 0;
 }

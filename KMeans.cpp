@@ -97,20 +97,6 @@ namespace Clustering {
         {
             std::cout << "You are asking for more clusters than you have points! Program Terminating." << std::endl;
         }
-//        // Clean up memory
-//        for (int n = 0; n < k; n++)
-//        {
-//            int size = clusterArray[n]->getSize();
-//
-//            for (int i = 0; i < size; i++) {
-//                delete clusterArray[n]->getPoint(i);    // delete all points in each cluster
-//            }
-//
-//            //TODO: delete nodes within cluster
-//
-//            delete clusterArray[n];     // delete 'k' dynamic clusters
-//        }
-//        delete [] clusterArray;            // delete dynamic cluster array
     }
 
 
@@ -205,6 +191,22 @@ namespace Clustering {
         }
     }
 
+
+    KMeans::~KMeans()
+    {
+        // Clean up memory
+        for (int n = 0; n < k; n++)
+        {
+            int size = clusterArray[n]->getSize();
+
+            for (int i = 0; i < size; i++) {
+                delete clusterArray[n]->getPoint(i);    // delete all points in each cluster
+            }
+
+            delete clusterArray[n];     // delete 'k' dynamic clusters
+        }
+        delete [] clusterArray;            // delete dynamic cluster array
+    }
 
     double KMeans::computeClusteringScore()
     {
