@@ -1,62 +1,53 @@
 //
-// Created by Adam on 10/8/2015.
+// Created by Adam on 11/6/2015.
 //
 
 #include "KMeans.h"
 #include <fstream>
-#include <cmath>
 
 namespace Clustering {
-
     KMeans::KMeans()
     {
         // Set member variables
-        k = 7;                          // Arbitrary # of clusters
-        d = 2;
+        __k = 5;                          // Arbitrary # of clusters
+        __d = 2;
         double score, prevScore;
         double scoreDiff = SCORE_DIFF_THRESHOLD + 1;
 
         // Initializing Algorithm
         std::ifstream csv("points.txt");
-        Cluster* pointSpace = new Cluster;
-        pointSpace->setDimensionality(d);
-        csv >> *pointSpace;
-        point_space = pointSpace;
-        if (k <= point_space->getSize()) {
-            initCentroids = new PointPtr[k];
-            for (int i = 0; i < k; i++)
-                initCentroids[i] = nullptr;             // set all array values to null, mainly for testing purposes
-            point_space->pickPoints(k, initCentroids);
-            point_space->setCentroid(
-                    *initCentroids[0]); // set point_space cluster's centroid as first entry in initCent.
+        __point_space = new Cluster;
+        __point_space->setDimensionality(__d);
+        csv >> *__point_space;
+        if (__k <= __point_space->getSize()) {
+            __point_space->pickPoints(__k, __initCentroids);
+            __point_space->setCentroid(__initCentroids[0]); // set point_space cluster's centroid as first entry in initCent.
 
-            clusterArray = new Cluster *[k];             // Create dynamic array of ClusterPtrs
-
-            clusterArray[0] = point_space;              // put original pointspace cluster into array
-            for (int i = 1; i < k; i++)                 // populate the cluster array
+            __clusterArray.push_back(*__point_space);              // put original pointspace cluster into array
+            for (int i = 1; i < __k; i++)                 // populate the cluster array
             {
                 Cluster *newCluster = new Cluster;
-                newCluster->setDimensionality(d);
-                newCluster->setCentroid(*initCentroids[i]);
+                newCluster->setDimensionality(__d);
+                newCluster->setCentroid(__initCentroids[i]);
                 newCluster->validCentroid();
-                clusterArray[i] = newCluster;
+                __clusterArray.push_back(*newCluster);
             }
 
 //        KMeans Algorithm
             while (scoreDiff > SCORE_DIFF_THRESHOLD)            // loop until diff < diffThreshold
             {
                 static int iter = 0;
-                for (int i = 0; i < k; i++)                     // loop thru all clusters
+                for (int i = 0; i < __k; i++)                     // loop thru all clusters
                 {
-                    for (int j = 0; j < clusterArray[i]->getSize(); j++)         // loop thru all points in cluster
+                    for (int j = 0; j < __clusterArray[i].getSize(); j++)         // loop thru all points in cluster
                     {
-                        PointPtr point = clusterArray[i]->getPoint(j);  // get point for comparisons
-                        double closestCentDist = point->distanceTo(clusterArray[i]->getCentroid());
+                        Point point = __clusterArray[i].getPoint(j);  // get point for comparisons
+                        double closestCentDist = point.distanceTo(__clusterArray[i].getCentroid());
                         int closestCentInd = i;
-                        for (int l = 0; l < k; l++)             // loop thru every centroid to compare w point
+                        for (int l = 0; l < __k; l++)             // loop thru every centroid to compare w point
                         {
                             if (i != l) {
-                                double otherCentDist = point->distanceTo(clusterArray[l]->getCentroid());
+                                double otherCentDist = point.distanceTo(__clusterArray[l].getCentroid());
                                 if (closestCentDist > otherCentDist) {
                                     closestCentDist = otherCentDist;
                                     closestCentInd = l;
@@ -64,15 +55,15 @@ namespace Clustering {
                             }
                         }
                         if (closestCentInd != i) {
-                            Cluster::Move(point, clusterArray[i], clusterArray[closestCentInd]).perform();
+                            Cluster::Move(point, &__clusterArray[i], &__clusterArray[closestCentInd]).perform();
                         }
                     }
                 }
 
-                for (int m = 0; m < k; m++)                     // loop thru all clusters to recompute centroid
+                for (int m = 0; m < __k; m++)                     // loop thru all clusters to recompute centroid
                 {
-                    if (!(clusterArray[m]->validCentroid()))
-                        clusterArray[m]->computeCentroid();
+                    if (!(__clusterArray[m].validCentroid()))
+                        __clusterArray[m].computeCentroid();
                 }
 
                 prevScore = score;
@@ -84,12 +75,13 @@ namespace Clustering {
 
                 std::cout << "Iteration: " << ++iter << std::endl;
                 std::cout << "Score: " << score << std::endl;
+                std::cout << "ScoreDiff: " << scoreDiff << std::endl;
             }
 
             // Print all clusters
             std::ofstream outfile("output.txt");
-            for (int i = 0; i < k; i++) {
-                outfile << *clusterArray[i];
+            for (int i = 0; i < __k; i++) {
+                outfile << __clusterArray[i];
             }
             outfile.close();
         }
@@ -99,113 +91,22 @@ namespace Clustering {
         }
     }
 
-
-    KMeans::KMeans(int clusters, int dimensions)
-    {
-        // Set member variables
-        k = clusters;                          // Arbitrary # of clusters
-        d = dimensions;
-        double score, prevScore;
-        double scoreDiff = SCORE_DIFF_THRESHOLD + 1;
-
-        // Initializing Algorithm
-        std::ifstream csv("points.txt");
-        Cluster* pointSpace = new Cluster;
-        pointSpace->setDimensionality(d);
-        csv >> *pointSpace;
-        point_space = pointSpace;
-        if (k <= point_space->getSize()) {
-            initCentroids = new PointPtr[k];
-            for (int i = 0; i < k; i++)
-                initCentroids[i] = nullptr;             // set all array values to null, mainly for testing purposes
-            point_space->pickPoints(k, initCentroids);
-            point_space->setCentroid(
-                    *initCentroids[0]); // set point_space cluster's centroid as first entry in initCent.
-
-            clusterArray = new Cluster *[k];             // Create dynamic array of ClusterPtrs
-
-            clusterArray[0] = point_space;              // put original pointspace cluster into array
-            for (int i = 1; i < k; i++)                 // populate the cluster array
-            {
-                Cluster *newCluster = new Cluster;
-                newCluster->setDimensionality(d);
-                newCluster->setCentroid(*initCentroids[i]);
-                newCluster->validCentroid();
-                clusterArray[i] = newCluster;
-            }
-
-//        KMeans Algorithm
-            while (scoreDiff > SCORE_DIFF_THRESHOLD)            // loop until diff < diffThreshold
-            {
-                static int iter = 0;
-                for (int i = 0; i < k; i++)                     // loop thru all clusters
-                {
-                    for (int j = 0; j < clusterArray[i]->getSize(); j++)         // loop thru all points in cluster
-                    {
-                        PointPtr point = clusterArray[i]->getPoint(j);  // get point for comparisons
-                        double closestCentDist = point->distanceTo(clusterArray[i]->getCentroid());
-                        int closestCentInd = i;
-                        for (int l = 0; l < k; l++)             // loop thru every centroid to compare w point
-                        {
-                            if (i != l) {
-                                double otherCentDist = point->distanceTo(clusterArray[l]->getCentroid());
-                                if (closestCentDist > otherCentDist) {
-                                    closestCentDist = otherCentDist;
-                                    closestCentInd = l;
-                                }
-                            }
-                        }
-                        if (closestCentInd != i) {
-                            Cluster::Move(point, clusterArray[i], clusterArray[closestCentInd]).perform();
-                        }
-                    }
-                }
-
-                for (int m = 0; m < k; m++)                     // loop thru all clusters to recompute centroid
-                {
-                    if (!(clusterArray[m]->validCentroid()))
-                        clusterArray[m]->computeCentroid();
-                }
-
-                prevScore = score;
-
-                // Compute new Clustering Score
-                score = computeClusteringScore();
-
-                scoreDiff = fabs(score - prevScore);
-
-                std::cout << "Iteration: " << ++iter << std::endl;
-                std::cout << "Score: " << score << std::endl;
-            }
-
-            // Print all clusters
-            std::ofstream outfile("output.txt");
-            for (int i = 0; i < k; i++) {
-                outfile << *clusterArray[i];
-            }
-            outfile.close();
-        }
-        else
-        {
-            std::cout << "You are asking for more clusters than you have points! Program Terminating." << std::endl;
-        }
-    }
 
 
     KMeans::~KMeans()
     {
-        // Clean up memory
-        for (int n = 0; n < k; n++)
-        {
-            int size = clusterArray[n]->getSize();
-
-            for (int i = 0; i < size; i++) {
-                delete clusterArray[n]->getPoint(i);    // delete all points in each cluster
-            }
-
-            delete clusterArray[n];     // delete 'k' dynamic clusters
-        }
-        delete [] clusterArray;            // delete dynamic cluster array
+//        // Clean up memory
+//        for (int n = 0; n < __k; n++)
+//        {
+//            int size = __clusterArray[n].getSize();
+//
+//            for (int i = 0; i < size; i++) {
+//                delete __clusterArray[n][i];    // delete all points in each cluster
+//            }
+//
+//            delete __clusterArray[n];     // delete 'k' dynamic clusters
+//        }
+//        delete [] clusterArray;            // delete dynamic cluster array
     }
 
     double KMeans::computeClusteringScore()
@@ -213,19 +114,19 @@ namespace Clustering {
         double BetaCV = 0, Din = 0, Dout = 0;
 
         // Compute Din
-        for (int i = 0; i < k; i++)
+        for (int i = 0; i < __k; i++)
         {
-            Din = Din + clusterArray[i]->intraClusterDistance();
+            Din = Din + __clusterArray[i].intraClusterDistance();
         }
 
         // Compute Dout
-        for (int j = 0; j < k; j++)
+        for (int j = 0; j < __k; j++)
         {
-            for (int l = 0; l < k; l++)
+            for (int l = 0; l < __k; l++)
             {
                 if (j != l) {                           // Don't add distance between itself
-                    Cluster c1 = *clusterArray[l];
-                    Cluster c2 = *clusterArray[j];
+                    Cluster c1 = __clusterArray[l];
+                    Cluster c2 = __clusterArray[j];
                     Dout = Dout + interClusterDistance(c1, c2);
                 }
             }
@@ -233,18 +134,18 @@ namespace Clustering {
 
         // Compute Pin
         int Pin = 0;
-        for (int m = 0; m < k; m++)
+        for (int m = 0; m < __k; m++)
         {
-            Pin = Pin + clusterArray[m]->getClusterEdges();
+            Pin = Pin + __clusterArray[m].getClusterEdges();
         }
 
         // Compute Pout
         int Pout = 0;
-        for (int n = 0; n < k; n++)
+        for (int n = 0; n < __k; n++)
         {
-            for (int o = n + 1; o < (k - 1); o++)
+            for (int o = n + 1; o < (__k - 1); o++)
             {
-                Pout = Pout + interClusterEdges(*clusterArray[n],*clusterArray[o]);
+                Pout = Pout + interClusterEdges(__clusterArray[n],__clusterArray[o]);
             }
         }
 

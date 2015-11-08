@@ -1,121 +1,103 @@
 //
-// Created by Adam on 9/20/2015.
+// Created by Adam on 11/4/2015.
 //
 
-#ifndef CLUSTERING_CLUSTER_H
-#define CLUSTERING_CLUSTER_H
+#ifndef IP_PA4_CLUSTER_H
+#define IP_PA4_CLUSTER_H
 
 #include "Point.h"
+#include <forward_list>
 
 namespace Clustering {
-
-    typedef Point *PointPtr;                    // Pointer to a point (goes inside node)
-    typedef struct LNode *LNodePtr;             // Pointer to an LNode
-
-    struct LNode {                              // linked-list node
-        PointPtr p;
-        LNodePtr next;
-                            // could add this: LNode(PointPtr pt, LNodePtr n) : p(pt), next(n) {}  // Node Constructor
-    };
-
     class Cluster {
-        int size;
-        int __dimensionality;
-        LNodePtr points;                        // linked-list head (points to first node)
+    private:
+        unsigned int __dim;
         unsigned int __id;
-        PointPtr __centroid;
+        unsigned int __size;
         bool __valid_centroid;
-
+        Point __centroid;
+        std::forward_list<Point> pointList;
     public:
-        // Set the ID
-        void generateID();
+        // Constructors
+        Cluster() : __dim(0), __size(0), __valid_centroid(false), __centroid(0) { generateID(); };
 
-        Cluster() : size(0), points(nullptr), __dimensionality(0), __valid_centroid(false), __centroid(nullptr) { generateID(); };
-
-        // The big three: cpy constructor, overloaded operator=, destructor
-        Cluster(const Cluster &);
-        Cluster &operator=(const Cluster &);
+        // Big 3 (cpy const, assign op, destr)
+        Cluster(const Cluster&);
+        Cluster &operator=(const Cluster&);
         ~Cluster();
 
-        // Point Getter
-        PointPtr getPoint(int);
+        // ID Gen
+        void generateID();
 
-        // ID Getter
-        int getID() const { return __id; }
+        // Set Dimensions
+        void setDimensionality(unsigned int dim) { __dim = dim; }
 
-        // Dimensionality Setter
-        void setDimensionality(const int);
+        // Get size
+        unsigned int getSize() { return __size; }
+
+        // Get ID
+        unsigned int getID() const { return __id; }
+
+        // Get specific Point
+        Point &operator[](unsigned int);
+
+        Point getPoint(unsigned int) const;
 
         // Centroid Operations
         void setCentroid(const Point &);
         void invalidateCentroid();
         const Point getCentroid();
         void computeCentroid();
+        bool validCentroid();
 
-        bool validCentroid()
-        {
-            if (__valid_centroid)
-                return true;
-            else
-                return false;
-        }
+        // Add and remove Points
+        void add(const Point &);
+        Cluster &operator+=(const Point &);
+        const Point &remove(const Point &);
+        Cluster &operator-=(const Point &rhs);
 
-        //9 - 11 Instructions Functions
-        void pickPoints(int k, PointPtr *pointArray);
-        int getSize() const;
+        // Union and Difference Clusters
+        Cluster &operator+=(const Cluster &);
+        Cluster &operator-=(const Cluster &);
 
-        // Cluster Distance Functions
-        double intraClusterDistance() const;    // inside the cluster
-        friend double interClusterDistance(const Cluster &, const Cluster &);   // between clusters
-        int getClusterEdges();
-        friend double interClusterEdges(const Cluster &c1, const Cluster &c2);
-
-        // Set functions: They allow calling c1.add(c2.remove(p));
-        void add(const PointPtr &);
-        const PointPtr &remove(const PointPtr &);
-
-        // Overloaded operators
-
-        // Set-preserving operators (do not duplicate points in the space)
-        // Friends
-        friend bool operator==(const Cluster &lhs, const Cluster &rhs);
-
-        // Members
-        Cluster &operator+=(const Cluster &rhs); // union
-        Cluster &operator-=(const Cluster &rhs); // (asymmetric) difference
-
-        Cluster &operator+=(const Point &rhs); // add point
-        Cluster &operator-=(const Point &rhs); // remove point
-
-        // Set-destructive operators (duplicate points in the space)
-        // Friends
-        friend const Cluster operator+(const Cluster &lhs, const Cluster &rhs);
-        friend const Cluster operator-(const Cluster &lhs, const Cluster &rhs);
-
-        friend const Cluster operator+(const Cluster &lhs, const PointPtr &rhs);
-        friend const Cluster operator-(const Cluster &lhs, const PointPtr &rhs);
-
-//         IO
+        // Friend Functions
+        friend bool operator==(const Cluster &, const Cluster &);
+        friend const Cluster operator+(const Cluster &, const Cluster &);
+        friend const Cluster operator-(const Cluster &, const Cluster &);
+        friend const Cluster operator+(const Cluster &, const Point &);
+        friend const Cluster operator-(const Cluster &, const Point &);
+        // I/O
         friend std::ostream &operator<<(std::ostream &, Cluster &);
         friend std::istream &operator>>(std::istream &, Cluster &);
 
+        //Kmeans interaction
+        void pickPoints(int k, std::vector<Point> &);
+
+        // Cluster Distance Functions
+        double intraClusterDistance() const;
+        friend double interClusterDistance(const Cluster &, const Cluster &);
+        int getClusterEdges();
+        friend double interClusterEdges(const Cluster &, const Cluster &);
+
         class Move {
         private:
-            Cluster* from;
-            Cluster* to;
-            PointPtr point;
+            Cluster* __from;
+            Cluster* __to;
+            Point __point;
         public:
-            Move(const PointPtr ptr, Cluster * from_set, Cluster * to_set)
+            Move(const Point pt, Cluster * from_set, Cluster * to_set) : __point(0)
             {
-                point = ptr;
-                this->from = from_set;
-                this->to = to_set;
+                __point = pt;
+                __from = from_set;
+                __to = to_set;
             }
             void perform()
             {
-                to->add(from->remove(point));
+                __to->add(__from->remove(__point));
             }
         };
     };
 }
-#endif //CLUSTERING_CLUSTER_H
+
+#include "Cluster.cpp"
+#endif //IP_PA4_CLUSTER_H

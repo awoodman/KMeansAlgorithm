@@ -1,9 +1,9 @@
 //
-// Created by Adam on 10/8/2015.
+// Created by Adam on 11/6/2015.
 //
 
-#ifndef PA2_IP_KMEANS_H
-#define PA2_IP_KMEANS_H
+#ifndef IP_PA4_KMEANS_H
+#define IP_PA4_KMEANS_H
 
 #include "Cluster.h"
 #include "Point.h"
@@ -11,18 +11,19 @@
 namespace Clustering {
     class KMeans {
     private:
-        Cluster* point_space;
-        Cluster** clusterArray;
-        int k;                                // Number of Clusters
-        int d;                                // Number of Dimensions
-        PointPtr *initCentroids;                  // Initial centroid array (to be populated w. pickPoints)
+        Cluster *__point_space;
+        std::vector<Cluster> __clusterArray;
+        unsigned int __k;
+        unsigned int __d;
+        std::vector<Point> __initCentroids;
     public:
-        static constexpr double SCORE_DIFF_THRESHOLD = 0.001;         // Termination condition for outer loop of iterative algorithm
-        KMeans();                                   // Default Constructor
+        static constexpr double SCORE_DIFF_THRESHOLD = 0.001;
+        KMeans();
         KMeans(int,int);
         ~KMeans();
         double computeClusteringScore();
     };
 }
 
-#endif //PA2_IP_KMEANS_H
+#include "KMeans.cpp"
+#endif //IP_PA4_KMEANS_H

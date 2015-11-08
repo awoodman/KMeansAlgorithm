@@ -1,308 +1,225 @@
 //
-// Created by Adam on 9/17/2015.
+// Created by Adam on 11/4/2015.
 //
 
-#include <cmath>
+#include "Point.h"
 #include <cstdlib>
 #include <string>
-#include "Point.h"
-#include "Cluster.h"
 #include <fstream>
 #include <sstream>
-#include <algorithm>
+#include <cmath>
 
-// iostream
-using std::cout;
-using std::endl;
-
-// fstream
-using std::ifstream;
-
-// sstream
-using std::stringstream;
 using std::string;
 
 namespace Clustering {
-// Set Dimensions (for __centroid)
-    void Point::setDims(int desDim)
-    {
-        dim = desDim;
-    }
-
-// Constructors
-
-    Point::Point(int dimension)     // Constructor to set all coordinates to 0
-    {
-        dim = dimension;
-
-        values = new double[dim];
-
-        for (int i = 0; i < dim; i++) {
-            values[i] = 0;
+    Point::Point(unsigned int dim) {
+        __dim = dim;
+        generateID();
+        for (int i = 0; i < __dim; i++) {
+            values.push_back(0);    // Initially set all coords as 0
         }
     }
 
-    Point::Point(int dimension, double *array)      // Constructor to pass in an array
-    {
-        dim = dimension;
-
-        values = new double[dim];
-
-        for (int i = 0; i < dim; i++) {
-            values[i] = array[i];
+    Point::Point(unsigned int dim, dataType *array) {
+        __dim = dim;
+        generateID();
+        for (int i = 0; i < __dim; i++) {
+            values.push_back(array[i]);    // Set all coords as array data
         }
     }
 
-    //Copy Constructor
-    Point::Point(const Point & src)                         // Pass in source point
-    {
-        if (this != &src)                                    // Only do this stuff if source and this are different locations
+    Point::Point(const Point &src) {
+        __id = src.__id;
+        __dim = src.__dim;
+        values = src.values;
+    }
+
+    Point& Point::operator=(const Point & src) {
+        if (this->__id != src.__id)
         {
-            dim = src.dim;                                  // Copy Dimension
-
-            values = new double[dim];                       // Allocate new memory
-
-            for (int i = 1; i < (src.getDims()+1); i++) {
-                values[i-1] = src.getValue(i);                // Copy coordinates over
-            }
+            __id = src.__id;
+            __dim = src.__dim;
+            values = src.values;
         }
-        else {
-            values = NULL;                                  // I don't want this to point anywhere
-        }
+
+        return *this;
     }
 
-    //Assignment Operator
-    Point& Point::operator=(const Point & src)
-    {
-        if (this == &src)                                   // If a = a, return a
-        {
-            return *this;
-        }
-        else
-        {
-            dim = src.dim;                            // Copy Dimension
-
-            values = new double[dim];                       // Allocate new memory
-
-            for (int i = 0; i < src.getDims(); i++) {
-                values[i] = src.getValue(i+1);                // Copy coordinates over
-            }
-
-            return *this;                                   // this points to the calling object
-        }
-    }
-
-    //Destructor
-    // Dynamic allocation for coordinates array, so must deallocate (delete) the memory
     Point::~Point() {
-        delete[] values;
+        //TODO: Destruct What??
     }
 
-    double Point::distanceTo(const Point &p) const         // Distance to, with any number of dims
+    void Point::generateID()
     {
+        static unsigned int id = 1;
+        __id = id++;
+    }
+
+    double Point::distanceTo(const Point &p) const {
         double inside = 0;
 
-        for (int i = 0; i < dim; i++) {
-            inside += pow((p.values[i] - values[i]), 2);
+        for (int i = 0; i < __dim; i++) {
+            inside += pow((this->values[i] - p.values[i]),2);
         }
 
         double distance = sqrt(inside);
         return distance;
     }
 
-    void Point::setValue(int dimension, double coord)     // Set a coordinate
+    void Point::setDims(unsigned int dim) {
+        __dim = dim;
+    }
+
+    void Point::setValue(unsigned int index, dataType data)
     {
-        if (dimension > (dim))
-            std::cout << "That's outside this array" << std::endl;
+        values[index] = data;
+    }
+
+    Point & Point::operator*=(double multiplier) {
+        for (int i = 0; i < __dim; i++)
+            values[i] = values[i] * multiplier;
+
+        return *this;
+    }
+
+    Point & Point::operator/=(double denominator)
+    {
+        if (denominator != 0) {
+            for (int i = 0; i < __dim; i++) {
+                values[i] = values[i] / denominator;
+            }
+        }
         else
-            values[dimension-1] = coord;
-    }
-
-    double Point::getValue(int dimension) const   // Get a coordinate
-    {
-        return values[dimension-1];
-    }
-
-
-    // Members
-    Point& Point::operator*=(double multiplier)
-    {
-        for (int i = 0; i < dim; i++)
-        {
-            values[i] = values[i]*multiplier;
-        }
+            cout << "Cannot divide by zero" << endl;
 
         return *this;
     }
 
-    Point& Point::operator/=(double denom)
-    {
-        if (denom == 0) {
-            std::cout << "Cannot divide by zero" << std::endl;
-            return *this;
-        }
-
-        for (int i = 0; i < dim; i++)
-        {
-            values[i] = values[i] / static_cast<double>(denom);
-        }
-
-        return *this;
-    }
-
-    const Point Point::operator*(double multiplier) const
-    {
-        Point product(this->getDims());
-
-        for (int i = 0; i < this->getDims(); i++)
-        {
-            product.setValue(i,this->getValue(i));
-        }
-
-        for (int i = 0; i < this->getDims(); i++)
-        {
-
-            product.setValue(i,(product.getValue(i))*multiplier);
-        }
-
+    const Point Point::operator*(double multiplier) const {
+        Point product(*this);
+        product*=multiplier;
         return product;
     }
 
-    const Point Point::operator/(double denom) const
-    {
-        if (denom == 0) {
-            std::cout << "Cannot divide by zero" << std::endl;
-            return *this;
-        }
-
-        PointPtr quotient;
-        quotient = new Point(this->getDims());
-
-        for (int i = 1; i < ((this->getDims())+1); i++)
-        {
-
-            quotient->setValue(i,this->getValue(i));
-        }
-
-        for (int i = 1; i < ((this->getDims())+1); i++)
-        {
-
-            quotient->setValue(i,(quotient->getValue(i))/denom);
-        }
-
-        return *quotient;
+    const Point Point::operator/(double denominator) const {
+        Point quotient(*this);
+        quotient/=denominator;
+        return quotient;
     }
 
-    Point &operator+=(Point & dst, const Point & src)
-    {
-        for (int i = 0; i < dst.getDims(); i++)
-        {
-            dst.values[i] = dst.values[i] + src.values[i];
-        }
-
-        return dst;
-    }
-
-    Point &operator-=(Point & dst, const Point & src)
-    {
-        for (int i = 0; i < dst.getDims(); i++)
-        {
-            dst.values[i] = dst.values[i] - src.values[i];
-        }
-
-        return dst;
-    }
-
-    const Point operator+(const Point & lhs, const Point & rhs)
-    {
-        Point result(lhs.getDims());
-
-        for (int i = 0; i < lhs.getDims(); i++)
-        {
-            result.setValue(i,(lhs.values[i]+rhs.values[i]));
-        }
-
-        return result;
-    }
-
-    const Point operator-(const Point & lhs, const Point & rhs)
-    {
-        Point result(lhs.getDims());
-
-        for (int i = 0; i < lhs.dim; i++)
-        {
-            result.setValue(i,(lhs.values[i]-rhs.values[i]));
-        }
-
-        return result;
-    }
-
-    bool operator==(const Point & lhs, const Point & rhs)
-    {
-        for (int i  = 0; i < lhs.dim; i++)
-        {
-            if (lhs.values[i] != rhs.values[i])
-            {
-                return false;
+    Point &operator+=(Point & dst, const Point & src) {
+        if (dst.__dim == src.__dim) {
+            for (int i = 0; i < src.__dim; i++) {
+                dst.values[i] = dst.values[i] + src.values[i];
             }
         }
-        return true;
+        else
+            cout << "The dimensions of these points are different" << endl;
     }
 
-    bool operator!=(const Point & lhs, const Point & rhs)
-    {
+    Point &operator-=(Point & dst, const Point & src) {
+        if (dst.__dim == src.__dim) {
+            for (int i = 0; i < src.__dim; i++) {
+                dst.values[i] = dst.values[i] - src.values[i];
+            }
+        }
+        else
+            cout << "The dimensions of these points are different" << endl;
+    }
+
+    const Point operator+(const Point & dst, const Point & src) {
+        if (dst.__dim == src.__dim) {
+            Point sum(dst);
+            for (int i = 0; i < src.__dim; i++) {
+                sum.values[i] = sum.values[i] + src.values[i];
+            }
+        }
+        else
+            cout << "The dimensions of these points are different" << endl;
+    }
+
+    const Point operator-(const Point & dst, const Point & src) {
+        if (dst.__dim == src.__dim) {
+            Point sum(dst);
+            for (int i = 0; i < src.__dim; i++) {
+                sum.values[i] = sum.values[i] - src.values[i];
+            }
+        }
+        else
+            cout << "The dimensions of these points are different" << endl;
+    }
+
+    bool operator==(const Point & lhs, const Point & rhs) {
+        if (lhs.__id != rhs.__id)
+            return false;
+        else if (lhs.__dim != rhs.__dim)
+            return false;
+        else {
+            for (int i = 0; i < lhs.__dim; i++) {
+                if (lhs.values[i] != rhs.values[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    bool operator!=(const Point & lhs, const Point & rhs) {
         bool decision;
-        for (int i  = 0; i < lhs.dim; i++)
-        {
-            if (lhs.values[i] == rhs.values[i])
-            {
-                decision = false;
+        if (lhs.__id == rhs.__id)
+            return false;
+        else if (lhs.__dim != rhs.__dim)
+            return true;
+        else {
+            for (int i = 0; i < lhs.__dim; i++) {
+                if (lhs.values[i] == rhs.values[i])
+                    decision = false;
+                else
+                    return true;
             }
-            else
-                return true;
-        }
-
-        return decision;
-    }
-
-    bool operator<(const Point & lhs, const Point & rhs)
-    {
-        bool decision;
-        for (int i  = 0; i < lhs.dim; i++)
-        {
-            if (lhs.values[i] > rhs.values[i])
-            {
-                return false;
-            }
-            else if (lhs.values[i] == rhs.values[i])
-                decision = false;
-            else if (lhs.values[i] < rhs.values[i])
-                return true;
         }
         return decision;
     }
 
-    bool operator>(const Point & lhs, const Point & rhs)
-    {
-        bool decision;
-        for (int i  = 0; i < lhs.dim; i++)
-        {
-            if (lhs.values[i] < rhs.values[i])
-            {
-                return false;
+    bool operator<(const Point & lhs, const Point & rhs) {
+        if (lhs.__dim == rhs.__dim) {
+            bool decision;
+            for (int i = 0; i < lhs.__dim; i++) {
+                if (lhs.values[i] > rhs.values[i])
+                {
+                    return false;
+                }
+                else if (lhs.values[i] == rhs.values[i])
+                    decision = false;
+                else if (lhs.values[i] < rhs.values[i])
+                    return true;
             }
-            else if (lhs.values[i] == rhs.values[i])
-                decision = false;
-            else if (lhs.values[i] > rhs.values[i])
-                return true;
         }
-        return decision;
+        else
+            cout << "The dimensions of these points are different" << endl;
     }
 
-    bool operator<=(const Point & lhs, const Point & rhs)
-    {
+    bool operator>(const Point & lhs, const Point & rhs) {
+        if (lhs.__dim == rhs.__dim) {
+            bool decision;
+            for (int i = 0; i < lhs.__dim; i++) {
+                if (lhs.values[i] < rhs.values[i])
+                {
+                    return false;
+                }
+                else if (lhs.values[i] == rhs.values[i])
+                    decision = false;
+                else if (lhs.values[i] > rhs.values[i])
+                    return true;
+            }
+        }
+        else
+            cout << "The dimensions of these points are different" << endl;
+    }
+
+    bool operator<=(const Point & lhs, const Point & rhs) {
         bool decision = true;
-        for (int i  = 0; i < lhs.dim; i++)
+        for (int i = 0; i < lhs.__dim; i++)
         {
             if (lhs.values[i] > rhs.values[i])
             {
@@ -318,10 +235,9 @@ namespace Clustering {
         return decision;
     }
 
-    bool operator>=(const Point & lhs, const Point & rhs)
-    {
+    bool operator>=(const Point & lhs, const Point & rhs) {
         bool decision = true;
-        for (int i  = 0; i < lhs.dim; i++)
+        for (int i  = 0; i < lhs.__dim; i++)
         {
             if (lhs.values[i] < rhs.values[i])
             {
@@ -337,34 +253,30 @@ namespace Clustering {
         return decision;
     }
 
-    std::ostream &operator<<(std::ostream & outputStream, const Point & rhs)
-    {
+    std::ostream &operator<<(std::ostream & outputStream, const Point & pt) {
         int index;
 
-        for (int i = 0; i < rhs.dim - 1; i++)
+        for (int i = 0; i < (pt.__dim - 1); i++)
         {
-            outputStream << rhs.values[i] << ", ";
-            index = i;
+            outputStream << pt.getValue(i) << ", ";
+            index = i + 1;
         }
 
-        outputStream << rhs.values[index + 1];
+        outputStream << pt.getValue(index);
         outputStream << " : ";
 
         return outputStream;
     }
 
-    std::istream &operator>>(std::istream & inputStream, Point & destPoint)
-    {
+    std::istream &operator>>(std::istream & inputStream, Point & pt) {
         static const char DELIM = ',';
-
         string value;
-        double d;
+        dataType d;
 
-        int i = 1;
+        int i = 0;
         while (getline(inputStream, value, DELIM)) {     // While delimiter (',') not yet reached
             d = atof(value.c_str());                    // Convert string to double
-            destPoint.setValue(i++, d);                         // Post-inc 'i'
+            pt.setValue(i++,d);                         // Post-inc 'i'
         }
-
     }
 }
