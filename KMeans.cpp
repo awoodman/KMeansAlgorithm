@@ -9,7 +9,7 @@ namespace Clustering {
     KMeans::KMeans()
     {
         // Set member variables
-        __k = 5;                          // Arbitrary # of clusters
+        __k = 3;                          // Arbitrary # of clusters
         __d = 2;
         double score, prevScore;
         double scoreDiff = SCORE_DIFF_THRESHOLD + 1;
