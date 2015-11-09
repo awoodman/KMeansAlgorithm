@@ -18,7 +18,8 @@ using std::stringstream;
 using std::string;
 
 namespace Clustering {
-    Cluster::Cluster(const Cluster& src): __centroid(0) {
+    template <typename T, int dim>
+    Cluster<T,dim>::Cluster(const Cluster<T,dim>& src): __centroid(0) {
         __centroid = src.__centroid;
         generateID();
         __size = src.__size;
@@ -27,7 +28,8 @@ namespace Clustering {
         pointList = src.pointList;
     }
 
-    Cluster &Cluster::operator=(const Cluster& src) {
+    template <typename T, int dim>
+    Cluster<T,dim> &Cluster<T,dim>::operator=(const Cluster<T,dim>& src) {
         pointList.clear();
         if (this->__id != src.__id) {
             __size = src.__size;
@@ -40,23 +42,26 @@ namespace Clustering {
         }
     }
 
-    Cluster::~Cluster() {
+    template <typename T, int dim>
+    Cluster<T,dim>::~Cluster() {
         //TODO: What to destruct?
     }
 
-    void Cluster::generateID() {
+    template <typename T, int dim>
+    void Cluster<T,dim>::generateID() {
         static int id = 1;
         __id = id++;
     }
 
-    Point & Cluster::operator[](unsigned int index) {
+    template <typename T, int dim>
+    Point<T,dim> & Cluster<T,dim>::operator[](unsigned int index) {
         if (pointList.empty()) {
             cout << "The cluster is empty" << endl;
             //TODO: Return what here?
         }
         else {
             if (index < __size) {
-                std::forward_list<Point>::iterator it = pointList.begin();
+                typename std::forward_list<Point<T,dim>>::iterator it = pointList.begin();
                 for (int i = 0; i < index; i++) {
                     it++;
                 }
@@ -65,8 +70,9 @@ namespace Clustering {
         }
     }
 
-    Point Cluster::getPoint(unsigned int index) const {
-        std::forward_list<Point>::const_iterator it = pointList.begin();
+    template <typename T, int dim>
+    Point<T,dim> Cluster<T,dim>::getPoint(unsigned int index) const {
+        typename std::forward_list<Point<T,dim>>::const_iterator it = pointList.begin();
         if (index == 0)
             return *it;
         else {
@@ -77,22 +83,26 @@ namespace Clustering {
         }
     }
 
-    void Cluster::setCentroid(const Point & pt) {
+    template <typename T, int dim>
+    void Cluster<T,dim>::setCentroid(const Point<T,dim> & pt) {
         __centroid = pt;
         __valid_centroid = true;
     }
 
-    void Cluster::invalidateCentroid() {
+    template <typename T, int dim>
+    void Cluster<T,dim>::invalidateCentroid() {
         __valid_centroid = false;
     }
 
-    const Point Cluster::getCentroid() {
+    template <typename T, int dim>
+    const Point<T,dim> Cluster<T,dim>::getCentroid() {
         return __centroid;
     }
 
-    void Cluster::computeCentroid() {
-        Point p(__dim);
-        std::forward_list<Point>::iterator it = pointList.begin();
+    template <typename T, int dim>
+    void Cluster<T,dim>::computeCentroid() {
+        Point<T,dim> p(__dim);
+        typename std::forward_list<Point<T,dim>>::iterator it = pointList.begin();
 
         while (it != pointList.end())
         {
@@ -104,14 +114,16 @@ namespace Clustering {
         __valid_centroid = true;
     }
 
-    bool Cluster::validCentroid() {
+    template <typename T, int dim>
+    bool Cluster<T,dim>::validCentroid() {
         if (__valid_centroid)
             return true;
         else
             return false;
     }
 
-    void Cluster::add(const Point & newPoint) {
+    template <typename T, int dim>
+    void Cluster<T,dim>::add(const Point<T,dim> & newPoint) {
         __dim = newPoint.getDims();
         if (pointList.empty()) {
             pointList.push_front(newPoint);
@@ -119,8 +131,8 @@ namespace Clustering {
         else {
             bool add = false;
             int i = 0;
-            std::forward_list<Point>::iterator it = pointList.begin();
-            std::forward_list<Point>::iterator it_next = it;
+            typename std::forward_list<Point<T,dim>>::iterator it = pointList.begin();
+            typename std::forward_list<Point<T,dim>>::iterator it_next = it;
             it_next++;
             if (newPoint <= *it) {
                 pointList.push_front(newPoint);
@@ -152,12 +164,14 @@ namespace Clustering {
         this->invalidateCentroid();
     }
 
-    Cluster & Cluster::operator+=(const Point &rhs) {
+    template <typename T, int dim>
+    Cluster<T,dim> & Cluster<T,dim>::operator+=(const Point<T,dim> &rhs) {
         this->add(rhs);
         return *this;
     }
 
-    const Point & Cluster::remove(const Point & remPoint) {
+    template <typename T, int dim>
+    const Point<T,dim> & Cluster<T,dim>::remove(const Point<T,dim> & remPoint) {
         if (pointList.front() == remPoint) {
             pointList.pop_front();
             invalidateCentroid();
@@ -166,8 +180,8 @@ namespace Clustering {
         }
         else {
             bool found = false;
-            std::forward_list<Point>::iterator it = pointList.begin();
-            std::forward_list<Point>::iterator it_next = pointList.begin();
+            typename std::forward_list<Point<T,dim>>::iterator it = pointList.begin();
+            typename std::forward_list<Point<T,dim>>::iterator it_next = pointList.begin();
             it_next++;
             int i = 0;
             while (*it_next != remPoint && (it_next != pointList.end())) {
@@ -189,24 +203,26 @@ namespace Clustering {
         }
     }
 
-    Cluster & Cluster::operator-=(const Point &rhs) {
+    template <typename T, int dim>
+    Cluster<T,dim> & Cluster<T,dim>::operator-=(const Point<T,dim> &rhs) {
         this->remove(rhs);
         return *this;
     }
 
-    Cluster & Cluster::operator+=(const Cluster &rhs) {
+    template <typename T, int dim>
+    Cluster<T,dim> & Cluster<T,dim>::operator+=(const Cluster<T,dim> &rhs) {
         if (rhs.__size == 0)
             return *this;
         else
         {
             bool add = true;
             int i = 0;
-            std::forward_list<Point>::const_iterator rhs_it = rhs.pointList.begin();
+            typename std::forward_list<Point<T,dim>>::const_iterator rhs_it = rhs.pointList.begin();
             while (i < rhs.__size)
             {
                 add = true;
                 int j = 0;
-                std::forward_list<Point>::iterator this_it = this->pointList.begin();
+                typename std::forward_list<Point<T,dim>>::iterator this_it = this->pointList.begin();
                 while ((j < __size) && add)
                 {
                     if (*this_it == *rhs_it) {
@@ -230,18 +246,19 @@ namespace Clustering {
         return *this;
     }
 
-    Cluster & Cluster::operator-=(const Cluster &rhs) {
+    template <typename T, int dim>
+    Cluster<T,dim> & Cluster<T,dim>::operator-=(const Cluster<T,dim> &rhs) {
         if (rhs.__size == 0)
             return *this;
         else
         {
             bool keep = true;
-            std::forward_list<Point>::iterator this_it = this->pointList.begin();
+            typename std::forward_list<Point<T,dim>>::iterator this_it = this->pointList.begin();
             int i = 0;
             while (i < __size)
             {
                 keep = true;
-                std::forward_list<Point>::const_iterator rhs_it = rhs.pointList.begin();
+                typename std::forward_list<Point<T,dim>>::const_iterator rhs_it = rhs.pointList.begin();
                 int j = 0;
                 while ((j < rhs.__size) && keep)
                 {
@@ -266,9 +283,10 @@ namespace Clustering {
         return *this;
     }
 
-    bool operator==(const Cluster &lhs, const Cluster &rhs) {
-        std::forward_list<Point>::const_iterator lhs_it = lhs.pointList.begin();
-        std::forward_list<Point>::const_iterator rhs_it = rhs.pointList.begin();
+    template <typename S, int dim>
+    bool operator==(const Cluster<S,dim> &lhs, const Cluster<S,dim> &rhs) {
+        typename std::forward_list<Point<S,dim>>::const_iterator lhs_it = lhs.pointList.begin();
+        typename std::forward_list<Point<S,dim>>::const_iterator rhs_it = rhs.pointList.begin();
         int i = 0, j = 0;
         bool decision = true;
 
@@ -298,32 +316,37 @@ namespace Clustering {
         }
     }
 
-    const Cluster operator+(const Cluster &lhs, const Cluster &rhs) {
-        Cluster tempCluster(lhs);
+    template <typename S, int dim>
+    const Cluster<S,dim> operator+(const Cluster<S,dim> &lhs, const Cluster<S,dim> &rhs) {
+        Cluster<S,dim> tempCluster(lhs);
         tempCluster+=rhs;
         return tempCluster;
     }
 
-    const Cluster operator-(const Cluster &lhs, const Cluster &rhs) {
-        Cluster tempCluster(lhs);
+    template <typename S, int dim>
+    const Cluster<S,dim> operator-(const Cluster<S,dim> &lhs, const Cluster<S,dim> &rhs) {
+        Cluster<S,dim> tempCluster(lhs);
         tempCluster-=rhs;
         return tempCluster;
     }
 
-    const Cluster operator+(const Cluster &lhs, const Point &rhs) {
-        Cluster tempCluster(lhs);
+    template <typename S, int dim>
+    const Cluster<S,dim> operator+(const Cluster<S,dim> &lhs, const Point<S,dim> &rhs) {
+        Cluster<S,dim> tempCluster(lhs);
         tempCluster+=rhs;
         return tempCluster;
     }
 
-    const Cluster operator-(const Cluster &lhs, const Point &rhs) {
-        Cluster tempCluster(lhs);
+    template <typename S, int dim>
+    const Cluster<S,dim> operator-(const Cluster<S,dim> &lhs, const Point<S,dim> &rhs) {
+        Cluster<S,dim> tempCluster(lhs);
         tempCluster-=rhs;
         return tempCluster;
     }
 
-    std::ostream &operator<<(std::ostream & os, Cluster & srcCluster) {
-        std::forward_list<Point>::iterator it = srcCluster.pointList.begin();
+    template <typename S, int dim>
+    std::ostream &operator<<(std::ostream & os, Cluster<S,dim> & srcCluster) {
+        typename std::forward_list<Point<S,dim>>::iterator it = srcCluster.pointList.begin();
         int i = 0;
         while (i < srcCluster.__size)
         {
@@ -335,20 +358,22 @@ namespace Clustering {
         return os;
     }
 
-    std::istream &operator>>(std::istream & is, Cluster & destCluster) {
+    template <typename S, int dim>
+    std::istream &operator>>(std::istream & is, Cluster<S,dim> & destCluster) {
         string line;
         static const char DELIM = ',';
 
         while (getline(is,line)) {                                 // While '\n' not yet reached (takes in whole line)
-            Point* p = new Point(destCluster.__dim);
+            Point<S,dim>* p = new Point<S,dim>(destCluster.__dim);
             stringstream lineStream(line);
             lineStream >> *p;
             destCluster.add(*p);
         }
     }
 
-    void Cluster::pickPoints(int k, std::vector<Point> & __initCent) {
-        std::forward_list<Point>::iterator it = this->pointList.begin();
+    template <typename T, int dim>
+    void Cluster<T,dim>::pickPoints(int k, std::vector<Point<T,dim>> & __initCent) {
+        typename std::forward_list<Point<T,dim>>::iterator it = this->pointList.begin();
         int increment = (this->__size)/k;
 
         // populate pointArray with 'k' points;
@@ -360,10 +385,11 @@ namespace Clustering {
         }
     }
 
-    double Cluster::intraClusterDistance() const
+    template <typename T, int dim>
+    double Cluster<T,dim>::intraClusterDistance() const
     {
-        std::forward_list<Point>::const_iterator it1 = this->pointList.begin();
-        std::forward_list<Point>::const_iterator it2 = it1;
+        typename std::forward_list<Point<T,dim>>::const_iterator it1 = this->pointList.begin();
+        typename std::forward_list<Point<T,dim>>::const_iterator it2 = it1;
         int i = 0, j = 0;
         double totalDist = 0;
 
@@ -384,9 +410,10 @@ namespace Clustering {
         return totalDist/2.0;
     }
 
-    double interClusterDistance(const Cluster &lhs, const Cluster &rhs) {
-        std::forward_list<Point>::const_iterator lhs_it = lhs.pointList.begin();
-        std::forward_list<Point>::const_iterator rhs_it = rhs.pointList.begin();
+    template <typename S, int dim>
+    double interClusterDistance(const Cluster<S,dim> &lhs, const Cluster<S,dim> &rhs) {
+        typename std::forward_list<Point<S,dim>>::const_iterator lhs_it = lhs.pointList.begin();
+        typename std::forward_list<Point<S,dim>>::const_iterator rhs_it = rhs.pointList.begin();
         int i = 0, j = 0;
 
         double totalDist = 0;
@@ -405,11 +432,13 @@ namespace Clustering {
         return totalDist;
     }
 
-    int Cluster::getClusterEdges() {
+    template <typename T, int dim>
+    int Cluster<T,dim>::getClusterEdges() {
         return __size*(__size-1)/2;
     }
 
-    double interClusterEdges(const Cluster &c1, const Cluster &c2) {
+    template <typename S, int dim>
+    double interClusterEdges(const Cluster<S,dim> &c1, const Cluster<S,dim> &c2) {
         int edges = c1.__size*c2.__size;
         return edges;
     }

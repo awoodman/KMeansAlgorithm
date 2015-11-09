@@ -1,138 +1,68 @@
 #include <iostream>
-
 #include "Point.h"
+#include "Cluster.h"
 #include "KMeans.h"
 
-// TESTING THE PUSH COMMAND WITH TAGS (THIS SHOULD CHANGE PA2-1.0)
+using namespace std;
 using namespace Clustering;
 
 int main() {
-
-//    Point p1(4);
-//    Point p2(p1);
-//    p1.setValue(1,3);
-//    p2.setValue(1,3);
+//    Point p1(5);
+//    p1[2] = 3.14;
+//    Point p2 = p1;
+//    Point p2(5);
+//    Point p3(5);
+//    Point p4(5);
+//    Point p5(5);
 //
-// //   std::cout << p1 << std::endl << p2 << std::endl;
+////    p2[1] = 3.14;
+////    p1[0] = 5;
+////    cout << (p1>=p2) << endl;
+////    p1*=5;
+////    p1+=p2;
 //
-//    if (p1 == p2) {
-//        std::cout << "Equal" << std::endl;
-//    }
-//
-//    if (p1 != p2) {
-//        std::cout << "Not Equal" << std::endl;
-//    }
-//
-//    if (p1 > p2) {
-//        std::cout << "Greater Than" << std::endl;
-//    }
-//
-//    if (p1 < p2) {
-//        std::cout << "Less Than" << std::endl;
-//    }
-//
-//    if (p1 <= p2) {
-//        std::cout << "Less Than or Equal" << std::endl;
-//    }
-//
-//    if (p1 >= p2) {
-//        std::cout << "Greater Than or Equal" << std::endl;
-//    }
-//
-//    p1+=p2;
-//
-////    std::cout << p1 << std::endl;
-//
-//    Point p3(4);
-//    p1.setValue(1,2);
-//    p1.setValue(2,3);
-//    p2.setValue(2,4);
-//    p2.setValue(3,6);
-//    p3.setValue(1,3.1415);
-//    Point p4(4);
-//    p4.setValue(1,8.642);
-//
-////    std::cout << p1 << std::endl << p2 << std::endl << p3 << std::endl << p4 << std::endl;
+//    p1[1] = 4;
+//    p2[0] = 5;
+//    p3[4] = 1;
+//    p4[3] = 2;
+//    p5[2] = 3;
 //
 //    Cluster c1;
-//    c1.add(&p1);
-//
 //    Cluster c2;
-//    c2.add(&p2);
+////    Cluster c2(c1);
+////    Cluster c3 = c1;
 //
-//    if (c1 == c2)
-//        std::cout << "They're Equal" << std::endl;
-//    else
-//        std::cout << "They're NOT Equal" << std::endl;
+////    c3.computeCentroid();
 //
-//    Cluster c3(c1);
+//    c1.add(p1);
+//    c1.add(p2);
+//    c1.add(p3);
+//    c2.add(p1);
+//    c2.add(p2);
+//    c2.add(p5);
 //
-//    PointPtr Point2 = &p2;
-//    c3.add(Point2);
-//    PointPtr Point3 = &p3;
-//
-//    c3 = c3 + Point3;
-//
-//    c3+=p4;
-//
-//    c3-=p3;
-//
-//    c2 = c3 + Point3;
-//
-//    c2 = c2 - Point2;
-//    c1.add(&p3);
-//    c1.remove(&p3);
+//    cout << c1.validCentroid() << endl;
 //    c1.computeCentroid();
-//
-//    Cluster c5 = c1 - c3;
-//
-//    c5+=c3;
-//
-//    c5-=c3;
+//    cout << c1.validCentroid() << endl;
 
-    // Testing Point >> operator
-//    Point p5(5);
-//    Point p6(5);
-//    Point p7(5);
-//    Point p8(5);
-//    csv >> p5;
-//    csv >> p6;
-//    csv >> p7;
-//    csv >> p8;
-//    std::cout << p5 << std::endl;
-//    std::cout << p6 << std::endl;
-//    std::cout << p7 << std::endl;
-//    std::cout << p8 << std::endl;
-//    csv.close();
-//
-//
-//    // Testing Point << operator
-//    std::ofstream outfile("output.txt");
-//    outfile << p5;
-//    outfile << p6;
-//    outfile.close();
+//    c1.remove(p5);
+//    c1+=p5;
+//    c2.add(c1.remove(p3));
+//    c1+=c2; //Union
+//    c1.remove(p2);
 
-//    std::ifstream csv("points.txt");
-//    Cluster pointSpace;
-//    csv >> pointSpace;
-//
-//    pointSpace.computeCentroid();
-//
-//    csv.close();
+//    c1-=c2;
+//    cout << interClusterDistance(c2,c1) << endl;
+//    cout << c1.intraClusterDistance() << " " << c2.intraClusterDistance() << endl;
+//    cout << c1.getClusterEdges() << " " << c2.getClusterEdges() << endl;
+//    cout << interClusterEdges(c1,c2) << " " << interClusterEdges(c2, c1) << endl;
 
-//
-//    Cluster c4;
-//    c4.add(&p1);
-//    c4.add(&p2);
+//    KMeans<3,2> test;
 
-//    Cluster c5;
-//    c5.add(&p3);
-//    c5.add(&p4);
-//    std::cout << "IntraCluster Distance: " << c4.intraClusterDistance() << std::endl;
-//    std::cout << interClusterDistance(c4,c5) << std::endl;
-//    std::cout << c4.getClusterEdges();
+    Point<double,3> p1;
+    Cluster<Point<double,3>,3> c1;
 
-    KMeans testAlg(5,3);
+    c1.add(p1);
 
     return 0;
 }

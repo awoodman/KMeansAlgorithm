@@ -12,29 +12,41 @@
 using std::string;
 
 namespace Clustering {
-    Point::Point(unsigned int dim) {
-        __dim = dim;
+    template <typename T,int dim>
+    Point<T,dim>::Point() : __dim(dim) {
+        generateID();
+        for (int i = 0; i < __dim; i++) {
+            values.push_back(0);
+        }
+    };
+
+    template <typename T,int dim>
+    Point<T,dim>::Point(unsigned int dims) {
+        __dim = dims;
         generateID();
         for (int i = 0; i < __dim; i++) {
             values.push_back(0);    // Initially set all coords as 0
         }
     }
 
-    Point::Point(unsigned int dim, dataType *array) {
-        __dim = dim;
+    template <typename T,int dim>
+    Point<T,dim>::Point(unsigned int dims, dataType *array) {
+        __dim = dims;
         generateID();
         for (int i = 0; i < __dim; i++) {
             values.push_back(array[i]);    // Set all coords as array data
         }
     }
 
-    Point::Point(const Point &src) {
+    template <typename T,int dim>
+    Point<T,dim>::Point(const Point<T,dim> &src) {
         __id = src.__id;
         __dim = src.__dim;
         values = src.values;
     }
 
-    Point& Point::operator=(const Point & src) {
+    template <typename T,int dim>
+    Point<T,dim>& Point<T,dim>::operator=(const Point<T,dim> & src) {
         if (this->__id != src.__id)
         {
             __id = src.__id;
@@ -45,17 +57,20 @@ namespace Clustering {
         return *this;
     }
 
-    Point::~Point() {
+    template <typename T,int dim>
+    Point<T,dim>::~Point() {
         //TODO: Destruct What??
     }
 
-    void Point::generateID()
+    template <typename T,int dim>
+    void Point<T,dim>::generateID()
     {
         static unsigned int id = 1;
         __id = id++;
     }
 
-    double Point::distanceTo(const Point &p) const {
+    template <typename T,int dim>
+    double Point<T,dim>::distanceTo(const Point<T,dim> &p) const {
         double inside = 0;
 
         for (int i = 0; i < __dim; i++) {
@@ -66,23 +81,27 @@ namespace Clustering {
         return distance;
     }
 
-    void Point::setDims(unsigned int dim) {
-        __dim = dim;
+    template <typename T,int dim>
+    void Point<T,dim>::setDims(unsigned int dims) {
+        __dim = dims;
     }
 
-    void Point::setValue(unsigned int index, dataType data)
+    template <typename T,int dim>
+    void Point<T,dim>::setValue(unsigned int index, T data)
     {
         values[index] = data;
     }
 
-    Point & Point::operator*=(double multiplier) {
+    template <typename T,int dim>
+    Point<T,dim> & Point<T,dim>::operator*=(double multiplier) {
         for (int i = 0; i < __dim; i++)
             values[i] = values[i] * multiplier;
 
         return *this;
     }
 
-    Point & Point::operator/=(double denominator)
+    template <typename T,int dim>
+    Point<T,dim> & Point<T,dim>::operator/=(double denominator)
     {
         if (denominator != 0) {
             for (int i = 0; i < __dim; i++) {
@@ -95,19 +114,22 @@ namespace Clustering {
         return *this;
     }
 
-    const Point Point::operator*(double multiplier) const {
-        Point product(*this);
+    template <typename T,int dim>
+    const Point<T,dim> Point<T,dim>::operator*(double multiplier) const {
+        Point<T,dim> product(*this);
         product*=multiplier;
         return product;
     }
 
-    const Point Point::operator/(double denominator) const {
-        Point quotient(*this);
+    template <typename T,int dim>
+    const Point<T,dim> Point<T,dim>::operator/(double denominator) const {
+        Point<T,dim> quotient(*this);
         quotient/=denominator;
         return quotient;
     }
 
-    Point &operator+=(Point & dst, const Point & src) {
+    template <typename S, int dim>
+    Point<S,dim> &operator+=(Point<S,dim> & dst, const Point<S,dim> & src) {
         if (dst.__dim == src.__dim) {
             for (int i = 0; i < src.__dim; i++) {
                 dst.values[i] = dst.values[i] + src.values[i];
@@ -117,7 +139,8 @@ namespace Clustering {
             cout << "The dimensions of these points are different" << endl;
     }
 
-    Point &operator-=(Point & dst, const Point & src) {
+    template <typename S, int dim>
+    Point<S,dim> &operator-=(Point<S,dim> & dst, const Point<S,dim> & src) {
         if (dst.__dim == src.__dim) {
             for (int i = 0; i < src.__dim; i++) {
                 dst.values[i] = dst.values[i] - src.values[i];
@@ -127,9 +150,10 @@ namespace Clustering {
             cout << "The dimensions of these points are different" << endl;
     }
 
-    const Point operator+(const Point & dst, const Point & src) {
+    template <typename S, int dim>
+    const Point<S,dim> operator+(const Point<S,dim> & dst, const Point<S,dim> & src) {
         if (dst.__dim == src.__dim) {
-            Point sum(dst);
+            Point<S,dim> sum(dst);
             for (int i = 0; i < src.__dim; i++) {
                 sum.values[i] = sum.values[i] + src.values[i];
             }
@@ -138,9 +162,10 @@ namespace Clustering {
             cout << "The dimensions of these points are different" << endl;
     }
 
-    const Point operator-(const Point & dst, const Point & src) {
+    template <typename S, int dim>
+    const Point<S,dim> operator-(const Point<S,dim> & dst, const Point<S,dim> & src) {
         if (dst.__dim == src.__dim) {
-            Point sum(dst);
+            Point<S,dim> sum(dst);
             for (int i = 0; i < src.__dim; i++) {
                 sum.values[i] = sum.values[i] - src.values[i];
             }
@@ -149,7 +174,8 @@ namespace Clustering {
             cout << "The dimensions of these points are different" << endl;
     }
 
-    bool operator==(const Point & lhs, const Point & rhs) {
+    template <typename S, int dim>
+    bool operator==(const Point<S,dim> & lhs, const Point<S,dim> & rhs) {
         if (lhs.__id != rhs.__id)
             return false;
         else if (lhs.__dim != rhs.__dim)
@@ -164,7 +190,8 @@ namespace Clustering {
         }
     }
 
-    bool operator!=(const Point & lhs, const Point & rhs) {
+    template <typename S, int dim>
+    bool operator!=(const Point<S,dim> & lhs, const Point<S,dim> & rhs) {
         bool decision;
         if (lhs.__id == rhs.__id)
             return false;
@@ -181,7 +208,8 @@ namespace Clustering {
         return decision;
     }
 
-    bool operator<(const Point & lhs, const Point & rhs) {
+    template <typename S, int dim>
+    bool operator<(const Point<S,dim> & lhs, const Point<S,dim> & rhs) {
         if (lhs.__dim == rhs.__dim) {
             bool decision;
             for (int i = 0; i < lhs.__dim; i++) {
@@ -199,7 +227,8 @@ namespace Clustering {
             cout << "The dimensions of these points are different" << endl;
     }
 
-    bool operator>(const Point & lhs, const Point & rhs) {
+    template <typename S, int dim>
+    bool operator>(const Point<S,dim> & lhs, const Point<S,dim> & rhs) {
         if (lhs.__dim == rhs.__dim) {
             bool decision;
             for (int i = 0; i < lhs.__dim; i++) {
@@ -217,7 +246,8 @@ namespace Clustering {
             cout << "The dimensions of these points are different" << endl;
     }
 
-    bool operator<=(const Point & lhs, const Point & rhs) {
+    template <typename S, int dim>
+    bool operator<=(const Point<S,dim> & lhs, const Point<S,dim> & rhs) {
         bool decision = true;
         for (int i = 0; i < lhs.__dim; i++)
         {
@@ -235,7 +265,8 @@ namespace Clustering {
         return decision;
     }
 
-    bool operator>=(const Point & lhs, const Point & rhs) {
+    template <typename S, int dim>
+    bool operator>=(const Point<S,dim> & lhs, const Point<S,dim> & rhs) {
         bool decision = true;
         for (int i  = 0; i < lhs.__dim; i++)
         {
@@ -253,7 +284,8 @@ namespace Clustering {
         return decision;
     }
 
-    std::ostream &operator<<(std::ostream & outputStream, const Point & pt) {
+    template <typename S, int dim>
+    std::ostream &operator<<(std::ostream & outputStream, const Point<S,dim> & pt) {
         int index;
 
         for (int i = 0; i < (pt.__dim - 1); i++)
@@ -268,7 +300,8 @@ namespace Clustering {
         return outputStream;
     }
 
-    std::istream &operator>>(std::istream & inputStream, Point & pt) {
+    template <typename S, int dim>
+    std::istream &operator>>(std::istream & inputStream, Point<S,dim> & pt) {
         static const char DELIM = ',';
         string value;
         dataType d;

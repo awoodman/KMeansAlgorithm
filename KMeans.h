@@ -8,18 +8,22 @@
 #include "Cluster.h"
 #include "Point.h"
 
+typedef double dataType;
+
 namespace Clustering {
+
+    template <int k, int dim>
     class KMeans {
     private:
-        Cluster *__point_space;
-        std::vector<Cluster> __clusterArray;
-        unsigned int __k;
-        unsigned int __d;
-        std::vector<Point> __initCentroids;
+        Cluster<Point<dataType,dim>,dim> *__point_space;
+        std::vector<Cluster<Point<dataType,dim>,dim>> __clusterArray;
+        int __k;
+        int __d;
+        std::vector<Point<dataType,dim>> __initCentroids;
     public:
         static constexpr double SCORE_DIFF_THRESHOLD = 0.001;
         KMeans();
-        KMeans(int,int);
+//        KMeans(int,int);
         ~KMeans();
         double computeClusteringScore();
     };

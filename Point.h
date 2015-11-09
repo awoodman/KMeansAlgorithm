@@ -15,39 +15,41 @@ using std::endl;
 typedef double dataType;
 
 namespace Clustering {
+    template <typename T, int dim>
     class Point {
     private:
         unsigned int __dim;
-        vector<dataType> values;
+        vector<T> values;
         unsigned int __id;
     public:
         // Constructors
+        Point();
         Point(unsigned int);
         Point(unsigned int, double*);
 
         // Big 3 (cpy const, assign op, destr)
-        Point(const Point &);
-        Point &operator=(const Point &);
+        Point(const Point<T,dim> &);
+        Point &operator=(const Point<T,dim> &);
         ~Point();
 
         // ID Gen
         void generateID();
 
         // Distance Function
-        double distanceTo(const Point &) const;
+        double distanceTo(const Point<T,dim> &) const;
 
         // Accessors & Mutators for data
         void setDims(unsigned int);
         unsigned int getDims() const { return __dim; }
-        void setValue(unsigned int, dataType);
-        dataType getValue(unsigned int index) const { return values[index]; }
+        void setValue(unsigned int, T);
+        T getValue(unsigned int index) const { return values[index]; }
 
         // Member Functions
         Point &operator*=(double);
         Point &operator/=(double);
         const Point operator*(double) const;
         const Point operator/(double) const;
-        dataType& operator[](unsigned int index)
+        T& operator[](unsigned int index)
         {
             if (index >= 0 && index < __dim)
                 return values[index];
@@ -58,18 +60,41 @@ namespace Clustering {
         }
 
         // Friend Functions
-        friend Point &operator+=(Point &, const Point &);
-        friend Point &operator-=(Point &, const Point &);
-        friend const Point operator+(const Point &, const Point &);
-        friend const Point operator-(const Point &, const Point &);
-        friend bool operator==(const Point &, const Point &);
-        friend bool operator!=(const Point &, const Point &);
-        friend bool operator<(const Point &, const Point &);
-        friend bool operator>(const Point &, const Point &);
-        friend bool operator<=(const Point &, const Point &);
-        friend bool operator>=(const Point &, const Point &);
-        friend std::ostream &operator<<(std::ostream &, const Point &);
-        friend std::istream &operator>>(std::istream &, Point &);
+        template <typename S, int _dim>
+        friend Point<S,_dim> &operator+=(Point<S,_dim> &, const Point<S,_dim> &);
+
+        template <typename S, int _dim>
+        friend Point<S,_dim> &operator-=(Point<S,_dim> &, const Point<S,_dim> &);
+
+        template <typename S, int _dim>
+        friend const Point<S,_dim> operator+(const Point<S,_dim> &, const Point<S,_dim> &);
+
+        template <typename S, int _dim>
+        friend const Point<S,_dim> operator-(const Point<S,_dim> &, const Point<S,_dim> &);
+
+        template <typename S, int _dim>
+        friend bool operator==(const Point<S,_dim> &, const Point<S,_dim> &);
+
+        template <typename S, int _dim>
+        friend bool operator!=(const Point<S,_dim> &, const Point<S,_dim> &);
+
+        template <typename S, int _dim>
+        friend bool operator<(const Point<S,_dim> &, const Point<S,_dim> &);
+
+        template <typename S, int _dim>
+        friend bool operator>(const Point<S,_dim> &, const Point<S,_dim> &);
+
+        template <typename S, int _dim>
+        friend bool operator<=(const Point<S,_dim> &, const Point<S,_dim> &);
+
+        template <typename S, int _dim>
+        friend bool operator>=(const Point<S,_dim> &, const Point<S,_dim> &);
+
+        template <typename S, int _dim>
+        friend std::ostream &operator<<(std::ostream &, const Point<S,_dim> &);
+
+        template <typename S, int _dim>
+        friend std::istream &operator>>(std::istream &, Point<S,_dim> &);
     };
 }
 
