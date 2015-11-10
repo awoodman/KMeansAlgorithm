@@ -30,7 +30,7 @@ namespace Clustering {
     }
 
     template <typename T,int dim>
-    Point<T,dim>::Point(unsigned int dims, dataType *array) {
+    Point<T,dim>::Point(unsigned int dims, T *array) {
         __dim = dims;
         generateID();
         for (int i = 0; i < __dim; i++) {
@@ -304,7 +304,7 @@ namespace Clustering {
     std::istream &operator>>(std::istream & inputStream, Point<S,dim> & pt) {
         static const char DELIM = ',';
         string value;
-        dataType d;
+        S d;
 
         int i = 0;
         while (getline(inputStream, value, DELIM)) {     // While delimiter (',') not yet reached

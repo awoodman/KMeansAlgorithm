@@ -57,12 +57,24 @@ int main() {
 //    cout << c1.getClusterEdges() << " " << c2.getClusterEdges() << endl;
 //    cout << interClusterEdges(c1,c2) << " " << interClusterEdges(c2, c1) << endl;
 
-//    KMeans<3,2> test;
+    KMeans<Point<double,2>,5,2> test;
 
-    Point<double,3> p1;
-    Cluster<Point<double,3>,3> c1;
-
-    c1.add(p1);
+//    Point<double,3> p1;
+//    Point<double,3> p2;
+//    Point<double,3> p3;
+//    Point<double,3> p4;
+//    Point<double,3> p5;
+//    p1[0] = 3.1;
+//    p2[1] = 4.2;
+//    p3[2] = 5.3;
+//    p4[0] = 6.4;
+//    p5[1] = 7.5;
+//    Cluster<Point<double,3>,3> c1;
+//    c1.add(p1);
+//    c1.add(p2);
+//    c1.add(p3);
+//    c1.add(p4);
+//    c1.add(p5);
 
     return 0;
 }

@@ -12,12 +12,12 @@ namespace Clustering {
     template <typename T, int dim>
     class Cluster {
     private:
-        unsigned int __dim;
+        int __dim;
         unsigned int __id;
         unsigned int __size;
         bool __valid_centroid;
-        Point<T,dim> __centroid;
-        std::forward_list<Point<T,dim>> pointList;
+        T __centroid;
+        std::forward_list<T> pointList;
     public:
         // Constructors
         Cluster() : __dim(dim), __size(0), __valid_centroid(false), __centroid(0) { generateID(); };
@@ -40,21 +40,21 @@ namespace Clustering {
         unsigned int getID() const { return __id; }
 
         // Get specific Point
-        Point<T,dim> &operator[](unsigned int);
-        Point<T,dim> getPoint(unsigned int) const;
+        T &operator[](unsigned int);
+        T getPoint(unsigned int) const;
 
         // Centroid Operations
-        void setCentroid(const Point<T,dim> &);
+        void setCentroid(const T &);
         void invalidateCentroid();
-        const Point<T,dim> getCentroid();
+        const T getCentroid();
         void computeCentroid();
         bool validCentroid();
 
         // Add and remove Points
-        void add(const Point<T,dim> &);
-        Cluster<T,dim> &operator+=(const Point<T,dim> &);
-        const Point<T,dim> &remove(const Point<T,dim> &);
-        Cluster<T,dim> &operator-=(const Point<T,dim> &rhs);
+        void add(const T &);
+        Cluster<T,dim> &operator+=(const T &);
+        const T &remove(const T &);
+        Cluster<T,dim> &operator-=(const T &rhs);
 
         // Union and Difference Clusters
         Cluster<T,dim> &operator+=(const Cluster<T,dim> &);
@@ -62,46 +62,46 @@ namespace Clustering {
 
         // Friend Functions
         template <typename S, int _dim>
-        friend bool operator==(const Cluster<S,dim> &, const Cluster<S,dim> &);
+        friend bool operator==(const Cluster<S,_dim> &, const Cluster<S,_dim> &);
 
         template <typename S, int _dim>
-        friend const Cluster<S,dim> operator+(const Cluster<S,dim> &, const Cluster<S,dim> &);
+        friend const Cluster<S,_dim> operator+(const Cluster<S,_dim> &, const Cluster<S,_dim> &);
 
         template <typename S, int _dim>
-        friend const Cluster<S,dim> operator-(const Cluster<S,dim> &, const Cluster<S,dim> &);
+        friend const Cluster<S,_dim> operator-(const Cluster<S,_dim> &, const Cluster<S,_dim> &);
 
         template <typename S, int _dim>
-        friend const Cluster<S,dim> operator+(const Cluster<S,dim> &, const Point<S,dim> &);
+        friend const Cluster<S,_dim> operator+(const Cluster<S,_dim> &, const S &);
 
         template <typename S, int _dim>
-        friend const Cluster<S,dim> operator-(const Cluster<S,dim> &, const Point<S,dim> &);
+        friend const Cluster<S,_dim> operator-(const Cluster<S,_dim> &, const S &);
         // I/O
         template <typename S, int _dim>
-        friend std::ostream &operator<<(std::ostream &, Cluster<S,dim> &);
+        friend std::ostream &operator<<(std::ostream &, Cluster<S,_dim> &);
 
         template <typename S, int _dim>
-        friend std::istream &operator>>(std::istream &, Cluster<S,dim> &);
+        friend std::istream &operator>>(std::istream &, Cluster<S,_dim> &);
 
         //Kmeans interaction
-        void pickPoints(int k, std::vector<Point<T,dim>> &);
+        void pickPoints(int k, std::vector<T> &);
 
         // Cluster Distance Functions
         double intraClusterDistance() const;
 
         template <typename S, int _dim>
-        friend double interClusterDistance(const Cluster<S,dim> &, const Cluster<S,dim> &);
+        friend double interClusterDistance(const Cluster<S,_dim> &, const Cluster<S,_dim> &);
         int getClusterEdges();
 
         template <typename S, int _dim>
-        friend double interClusterEdges(const Cluster<S,dim> &, const Cluster<S,dim> &);
+        friend double interClusterEdges(const Cluster<S,_dim> &, const Cluster<S,_dim> &);
 
         class Move {
         private:
             Cluster<T,dim>* __from;
             Cluster<T,dim>* __to;
-            Point<T,dim> __point;
+            T __point;
         public:
-            Move(const Point<T,dim> pt, Cluster<T,dim>* from_set, Cluster<T,dim>* to_set) : __point(0)
+            Move(const T pt, Cluster<T,dim>* from_set, Cluster<T,dim>* to_set) : __point(0)
             {
                 __point = pt;
                 __from = from_set;
@@ -109,7 +109,8 @@ namespace Clustering {
             }
             void perform()
             {
-                __to->add(__from->remove(__point));
+                __to->add(__point);
+                __from->remove(__point);
             }
         };
     };

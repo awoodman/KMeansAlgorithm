@@ -11,8 +11,7 @@
 using std::vector;
 using std::cout;
 using std::endl;
-
-typedef double dataType;
+using std::endl;
 
 namespace Clustering {
     template <typename T, int dim>
@@ -25,7 +24,7 @@ namespace Clustering {
         // Constructors
         Point();
         Point(unsigned int);
-        Point(unsigned int, double*);
+        Point(unsigned int, T*);
 
         // Big 3 (cpy const, assign op, destr)
         Point(const Point<T,dim> &);

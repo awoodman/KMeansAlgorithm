@@ -6,8 +6,8 @@
 #include <fstream>
 
 namespace Clustering {
-    template <int k, int dim>
-    KMeans<k,dim>::KMeans() : __k(k), __d(dim)
+    template <typename T, int k, int dim>
+    KMeans<T,k,dim>::KMeans() : __k(k), __d(dim)
     {
         // Set member variables
         double score, prevScore;
@@ -15,7 +15,7 @@ namespace Clustering {
 
         // Initializing Algorithm
         std::ifstream csv("points.txt");
-        __point_space = new Cluster<Point<dataType,dim>,dim>;
+        __point_space = new Cluster<T,dim>;
         __point_space->setDimensionality(__d);
         csv >> *__point_space;
         if (__k <= __point_space->getSize()) {
@@ -25,7 +25,7 @@ namespace Clustering {
             __clusterArray.push_back(*__point_space);              // put original pointspace cluster into array
             for (int i = 1; i < __k; i++)                 // populate the cluster array
             {
-                Cluster<Point<dataType,dim>,dim> *newCluster = new Cluster<Point<dataType,dim>,dim>;
+                Cluster<T,dim> *newCluster = new Cluster<T,dim>;
                 newCluster->setDimensionality(__d);
                 newCluster->setCentroid(__initCentroids[i]);
                 newCluster->validCentroid();
@@ -40,7 +40,7 @@ namespace Clustering {
                 {
                     for (int j = 0; j < __clusterArray[i].getSize(); j++)         // loop thru all points in cluster
                     {
-                        Point<dataType,dim> point = __clusterArray[i].getPoint(j);  // get point for comparisons
+                        T point = __clusterArray[i].getPoint(j);  // get point for comparisons
                         double closestCentDist = point.distanceTo(__clusterArray[i].getCentroid());
                         int closestCentInd = i;
                         for (int l = 0; l < __k; l++)             // loop thru every centroid to compare w point
@@ -54,7 +54,7 @@ namespace Clustering {
                             }
                         }
                         if (closestCentInd != i) {
-                            Cluster<Point<dataType,dim>,dim>::Move(point, &__clusterArray[i], &__clusterArray[closestCentInd]).perform();
+                            typename Cluster<T,dim>::Move(point, &__clusterArray[i], &__clusterArray[closestCentInd]).perform();
                         }
                     }
                 }
@@ -91,8 +91,8 @@ namespace Clustering {
     }
 
 
-    template <int k, int dim>
-    KMeans<k,dim>::~KMeans()
+    template <typename T, int k, int dim>
+    KMeans<T,k,dim>::~KMeans()
     {
 //        // Clean up memory
 //        for (int n = 0; n < __k; n++)
@@ -108,8 +108,8 @@ namespace Clustering {
 //        delete [] clusterArray;            // delete dynamic cluster array
     }
 
-    template <int k, int dim>
-    double KMeans<k,dim>::computeClusteringScore()
+    template <typename T, int k, int dim>
+    double KMeans<T,k,dim>::computeClusteringScore()
     {
         double BetaCV = 0, Din = 0, Dout = 0;
 
@@ -125,8 +125,8 @@ namespace Clustering {
             for (int l = 0; l < __k; l++)
             {
                 if (j != l) {                           // Don't add distance between itself
-                    Cluster<Point<dataType,dim>,dim> c1 = __clusterArray[l];
-                    Cluster<Point<dataType,dim>,dim> c2 = __clusterArray[j];
+                    Cluster<T,dim> c1 = __clusterArray[l];
+                    Cluster<T,dim> c2 = __clusterArray[j];
                     Dout = Dout + interClusterDistance(c1, c2);
                 }
             }
