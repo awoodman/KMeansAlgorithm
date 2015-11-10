@@ -283,6 +283,22 @@ namespace Clustering {
         return *this;
     }
 
+    template <typename T, int dim>
+    bool Cluster<T,dim>::contains(const T& pt) {
+        bool decision = false;
+        typename std::forward_list<T>::const_iterator it = pointList.begin();
+        while (it != pointList.end()) {
+            if (*it == pt) {
+                return true;
+            }
+            else {
+                decision = false;
+                it++;
+            }
+        }
+        return decision;
+    }
+
     template <typename S, int dim>
     bool operator==(const Cluster<S,dim> &lhs, const Cluster<S,dim> &rhs) {
         typename std::forward_list<S>::const_iterator lhs_it = lhs.pointList.begin();

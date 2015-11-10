@@ -13,7 +13,7 @@ namespace Clustering {
     template <typename T, int k, int dim>
     class KMeans {
     private:
-        Cluster<T,dim> *__point_space;
+        Cluster<T,dim>*__point_space;
         std::vector<Cluster<T,dim>> __clusterArray;
         int __k;
         int __d;

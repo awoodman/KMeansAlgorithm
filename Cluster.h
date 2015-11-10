@@ -60,6 +60,9 @@ namespace Clustering {
         Cluster<T,dim> &operator+=(const Cluster<T,dim> &);
         Cluster<T,dim> &operator-=(const Cluster<T,dim> &);
 
+        // Contains a Point
+        bool contains(const T &);
+
         // Friend Functions
         template <typename S, int _dim>
         friend bool operator==(const Cluster<S,_dim> &, const Cluster<S,_dim> &);
