@@ -22,7 +22,7 @@ namespace Clustering {
         bool __valid_centroid;
         T __centroid;
         std::forward_list<T> pointList;
-        static std::unordered_map<std::string,double> distList;      // map w/ key type int,data type double
+        static std::unordered_map<unsigned int,double> distList;      // map w/ key type int,data type double
     public:
         // Constructors
         Cluster() : __dim(dim), __size(0), __valid_centroid(false), __centroid(0) { generateID(); };
@@ -43,9 +43,6 @@ namespace Clustering {
 
         // Get ID
         unsigned int getID() const { return __id; }
-
-        // Calculate Key
-//        std::string whatIsKey(const T&, const T&);
 
         // Get specific Point
         T &operator[](unsigned int);

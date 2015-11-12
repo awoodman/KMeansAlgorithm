@@ -10,7 +10,7 @@ namespace Clustering {
     KMeans<T,k,dim>::KMeans() : __k(k), __d(dim)
     {
         // Set member variables
-        double score, prevScore;
+        double score = 0, prevScore;
         double scoreDiff = SCORE_DIFF_THRESHOLD + 1;
 
         // Initializing Algorithm

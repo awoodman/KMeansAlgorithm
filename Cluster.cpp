@@ -19,7 +19,7 @@ using std::string;
 
 namespace Clustering {
     template <typename T, int dim>
-    std::unordered_map<std::string,double> Cluster<T,dim>::distList;
+    std::unordered_map<unsigned int,double> Cluster<T,dim>::distList;
 
     template <typename T, int dim>
     Cluster<T,dim>::Cluster(const Cluster<T,dim>& src): __centroid(0) {
@@ -55,26 +55,6 @@ namespace Clustering {
         static int id = 1;
         __id = id++;
     }
-
-//    template <typename T, int dim>
-//    std::string Cluster<T,dim>::whatIsKey(const T& p1, const T& p2) {
-//        unsigned int id1 = getID(p1);
-//        unsigned int id2 = getID(p2);
-//        string key;
-//        stringstream ss1, ss2;
-//        ss1 << id1;
-//        char* id1str = ss1.str();
-//        ss2 << id2;
-//        char* id2str = ss2.str();
-//
-//        if (id1str < id2str) {
-//            key = strcat(id1str, id2str);
-//        }
-//        else {
-//            key = strcat(id2str, id1str);
-//        }
-//        return key;
-//    };
 
     template <typename T, int dim>
     T & Cluster<T,dim>::operator[](unsigned int index) {
@@ -424,20 +404,13 @@ namespace Clustering {
         }
     }
 
-    std::string whatIsKey(unsigned int id1, unsigned int id2) {
-        string key;
-        std::stringstream ss1, ss2;
-        ss1 << id1;
-        string id1str = ss1.str();
-        ss2 << id2;
-        string id2str = ss2.str();
-
-        if (id1str < id2str) {
-            key = id1str + id2str;
+    unsigned int whatIsKey(unsigned int id1, unsigned int id2) {
+        if (id1 > id2) {
+            unsigned int temp = id2;
+            id2 = id1;
+            id1 = temp;
         }
-        else {
-            key = id2str + id1str;
-        }
+        unsigned int key = .5*(id1 + id2)*(id1 + id2 + 1) + id2;
         return key;
     }
 
@@ -452,13 +425,13 @@ namespace Clustering {
         while (i < __size) {
             while (j < __size) {
                 if (*it1 != *it2) {                                               // If the two points aren't equal
-                    string key = whatIsKey(it1->getID(),it2->getID());                   // Find what the key would be
-                    if (this->distList.count(key) > 0) {
+                    unsigned int key = whatIsKey(it1->getID(),it2->getID());                   // Find what the key would be
+                    if (this->distList.count(key)) {
                         totalDist = totalDist + this->distList.at(key);
                     }
                     else {                                                        // If distance hasn't been calc'd
                         double newDist = it1->distanceTo(*it2);                   // Calculate distance
-                        std::pair<std::string,double> newEntry(key,newDist);      // Make a pair of key,distance
+                        std::pair<unsigned int,double> newEntry(key,newDist);      // Make a pair of key,distance
                         this->distList.insert(newEntry);                                // Insert pair into map
                         totalDist = totalDist + newDist;                          // Calculate distance
                     }
@@ -485,13 +458,13 @@ namespace Clustering {
         while (i < lhs.__size) {
             while (j < rhs.__size) {
                 if (*lhs_it != *rhs_it) {                                               // If the points aren't equal
-                    string key = whatIsKey(lhs_it->getID(),rhs_it->getID());
-                    if (lhs.distList.count(key) > 0)
+                    unsigned int key = whatIsKey(lhs_it->getID(),rhs_it->getID());
+                    if (lhs.distList.count(key)) {
                         totalDist = totalDist + lhs.distList.at(key);                   // grab distance
-//                    }
+                    }
                     else {
                         double newDist = lhs_it->distanceTo(*rhs_it);                   // Calculate the new distance
-                        std::pair<std::string,double> newEntry(key,newDist);            // Make a pair of key, distance
+                        std::pair<unsigned int,double> newEntry(key,newDist);            // Make a pair of key, distance
                         totalDist = totalDist + newDist;                                // Calculate total distance
                         lhs.distList.insert(newEntry);                                  // Insert key and totalDist into map
                     }

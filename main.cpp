@@ -57,7 +57,7 @@ int main() {
 //    cout << c1.intraClusterDistance() << " " << c2.intraClusterDistance() << endl;
 //    cout << c1.getClusterEdges() << " " << c2.getClusterEdges() << endl;
 //    cout << interClusterEdges(c1,c2) << " " << interClusterEdges(c2, c1) << endl;
-//
+
 //    Point<double,3> p1;
 //    Point<double,3> p2;
 //    Point<double,3> p3;
@@ -74,19 +74,23 @@ int main() {
 //    c1.add(p3);
 //    c1.add(p4);
 //    c1.add(p5);
-//
+
 //    std::cout << "c1 contains p1: " << c1.contains(p1) << std::endl;
 //    std::cout << "c1 contains p5: " << c1.contains(p5) << std::endl;
 
     KMeans<Point<double,2>,5,2> test;
 
-//    std::string key = whatIsKey(p1.getID(),p2.getID());
+//    unsigned int key = whatIsKey(p1.getID(),p2.getID());
+//    c1.intraClusterDistance();
+//
+//    Cluster<Point<double,3>,3> c2;
+
 //    double newDist = p1.distanceTo(p2);
-//    std::unordered_map<std::string,double> map;
-//    std::pair<std::string,double> newEntry(key,newDist);
+//    std::unordered_map<unsigned int,double> map;
+//    std::pair<unsigned int,double> newEntry(key,newDist);
 //    map.insert(newEntry);
 //
-//    cout << map.at(key);
+//    cout << map.at(key) << " " << map.count(key);
 
     return 0;
 }
