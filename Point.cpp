@@ -1,13 +1,13 @@
 //
 // Created by Adam on 11/4/2015.
 //
-
-#include "Point.h"
 #include <cstdlib>
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <cmath>
+
+#include "Point.h"
 
 using std::string;
 
@@ -333,5 +333,6 @@ namespace Clustering {
             d = atof(value.c_str());                    // Convert string to double
             pt.setValue(i++,d);                         // Post-inc 'i'
         }
+        return inputStream;
     }
 }

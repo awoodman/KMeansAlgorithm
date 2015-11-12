@@ -1,9 +1,9 @@
 //
 // Created by Adam on 11/6/2015.
 //
+#include <fstream>
 
 #include "KMeans.h"
-#include <fstream>
 
 namespace Clustering {
     template <typename T, int k, int dim>
@@ -17,9 +17,15 @@ namespace Clustering {
         std::ifstream csv("points.txt");
         __point_space = new Cluster<T,dim>;
         __point_space->setDimensionality(__d);
+//        cout << "Reading in point data" << endl;
         csv >> *__point_space;
+//        cout << "Done reading in point data" << endl;
+        cout << "Max Map Size: " << __point_space->maxMapSize() << endl;
+        cout << "Number Distances to Store: " << (__point_space->getSize())*(__point_space->getSize()-1)/2 << endl;
+        cout << "------------------------------------------" << endl;
         if (__k <= __point_space->getSize()) {
             __point_space->pickPoints(__k, __initCentroids);
+//            cout << "Finished picking initial centroids" << endl;
             __point_space->setCentroid(__initCentroids[0]); // set point_space cluster's centroid as first entry in initCent.
 
             __clusterArray.push_back(*__point_space);              // put original pointspace cluster into array
@@ -68,6 +74,7 @@ namespace Clustering {
                 prevScore = score;
 
                 // Compute new Clustering Score
+//                cout << "Begin Compute Clustering Score..." << endl;
                 score = computeClusteringScore();
 
                 scoreDiff = fabs(score - prevScore);
@@ -75,6 +82,8 @@ namespace Clustering {
                 std::cout << "Iteration: " << ++iter << std::endl;
                 std::cout << "Score: " << score << std::endl;
                 std::cout << "ScoreDiff: " << scoreDiff << std::endl;
+                std::cout << "Current Map Size: " << __point_space->getMapSize() << std::endl;
+                std::cout << "------------------------------" << std::endl;
             }
 
             // Print all clusters
@@ -118,6 +127,7 @@ namespace Clustering {
         {
             Din = Din + __clusterArray[i].intraClusterDistance();
         }
+//        cout << "Din done" << endl;
 
         // Compute Dout
         for (int j = 0; j < __k; j++)
@@ -125,12 +135,11 @@ namespace Clustering {
             for (int l = 0; l < __k; l++)
             {
                 if (j != l) {                           // Don't add distance between itself
-                    Cluster<T,dim> c1 = __clusterArray[l];
-                    Cluster<T,dim> c2 = __clusterArray[j];
-                    Dout = Dout + interClusterDistance(c1, c2);
+                    Dout = Dout + interClusterDistance(__clusterArray[l],__clusterArray[j]);
                 }
             }
         }
+//        cout << "Dout done" << endl;
 
         // Compute Pin
         int Pin = 0;
@@ -138,6 +147,7 @@ namespace Clustering {
         {
             Pin = Pin + __clusterArray[m].getClusterEdges();
         }
+//        cout << "Pin done" << endl;
 
         // Compute Pout
         int Pout = 0;
@@ -148,8 +158,10 @@ namespace Clustering {
                 Pout = Pout + interClusterEdges(__clusterArray[n],__clusterArray[o]);
             }
         }
+//        cout << "Pout done" << endl;
 
         BetaCV = (Din / Pin) / (Dout / Pout);
+//        cout << "BetaCV done" << endl;
 
         return BetaCV;
     }

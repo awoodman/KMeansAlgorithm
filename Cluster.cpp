@@ -1,10 +1,10 @@
 //
 // Created by Adam on 11/4/2015.
 //
-
-#include "Cluster.h"
 #include <fstream>
 #include <sstream>
+
+#include "Cluster.h"
 
 // iostream
 using std::cout;
@@ -388,6 +388,7 @@ namespace Clustering {
             lineStream >> *p;
             destCluster.add(*p);
         }
+        return is;
     }
 
     template <typename T, int dim>
@@ -410,7 +411,7 @@ namespace Clustering {
             id2 = id1;
             id1 = temp;
         }
-        unsigned int key = .5*(id1 + id2)*(id1 + id2 + 1) + id2;
+        unsigned int key = ((id1 + id2)*(id1 + id2 + 1))/2 + id2;
         return key;
     }
 
@@ -425,14 +426,16 @@ namespace Clustering {
         while (i < __size) {
             while (j < __size) {
                 if (*it1 != *it2) {                                               // If the two points aren't equal
-                    unsigned int key = whatIsKey(it1->getID(),it2->getID());                   // Find what the key would be
+                    unsigned int key = whatIsKey(it1->getID(),it2->getID());      // Find what the key would be
                     if (this->distList.count(key)) {
                         totalDist = totalDist + this->distList.at(key);
+//                        cout << "Accessed value in map, in intraClusterDistance" << endl;
                     }
                     else {                                                        // If distance hasn't been calc'd
                         double newDist = it1->distanceTo(*it2);                   // Calculate distance
-                        std::pair<unsigned int,double> newEntry(key,newDist);      // Make a pair of key,distance
-                        this->distList.insert(newEntry);                                // Insert pair into map
+                        std::pair<unsigned int,double> newEntry(key,newDist);     // Make a pair of key,distance
+                        this->distList.insert(newEntry);                          // Insert pair into map
+//                        cout << "Inserted value in map, in intraClusterDistance" << endl;
                         totalDist = totalDist + newDist;                          // Calculate distance
                     }
                 }
@@ -461,12 +464,14 @@ namespace Clustering {
                     unsigned int key = whatIsKey(lhs_it->getID(),rhs_it->getID());
                     if (lhs.distList.count(key)) {
                         totalDist = totalDist + lhs.distList.at(key);                   // grab distance
+//                        cout << "Accessed value in map, in interClusterDistance" << endl;
                     }
                     else {
                         double newDist = lhs_it->distanceTo(*rhs_it);                   // Calculate the new distance
                         std::pair<unsigned int,double> newEntry(key,newDist);            // Make a pair of key, distance
                         totalDist = totalDist + newDist;                                // Calculate total distance
                         lhs.distList.insert(newEntry);                                  // Insert key and totalDist into map
+//                        cout << "Inserted value in map, in interClusterDistance" << endl;
                     }
                 }
                 rhs_it++;

@@ -5,12 +5,13 @@
 #ifndef IP_PA4_CLUSTER_H
 #define IP_PA4_CLUSTER_H
 
-#include "Point.h"
 #include <forward_list>
 #include <unordered_map>
 #include <cstring>
 #include <string>
 #include <cstdlib>
+
+#include "Point.h"
 
 namespace Clustering {
     template <typename T, int dim>
@@ -67,6 +68,10 @@ namespace Clustering {
 
         // Contains a Point
         bool contains(const T &);
+
+        //Max map size
+        unsigned int maxMapSize() { return distList.max_size(); }
+        unsigned int getMapSize() { return distList.size(); }
 
         // Friend Functions
         template <typename S, int _dim>
