@@ -19,6 +19,9 @@ using std::string;
 
 namespace Clustering {
     template <typename T, int dim>
+    std::unordered_map<std::string,double> Cluster<T,dim>::distList;
+
+    template <typename T, int dim>
     Cluster<T,dim>::Cluster(const Cluster<T,dim>& src): __centroid(0) {
         __centroid = src.__centroid;
         generateID();
@@ -450,15 +453,13 @@ namespace Clustering {
             while (j < __size) {
                 if (*it1 != *it2) {                                               // If the two points aren't equal
                     string key = whatIsKey(it1->getID(),it2->getID());                   // Find what the key would be
-                    auto dist_it = distList.find(key);                            // Find the key in the map
-                    if (dist_it != distList.end()) {                              // If dist has been calculated already
-                        double storedDist = distList.at(key);
-                        totalDist = totalDist + storedDist;
+                    if (this->distList.count(key) > 0) {
+                        totalDist = totalDist + this->distList.at(key);
                     }
                     else {                                                        // If distance hasn't been calc'd
                         double newDist = it1->distanceTo(*it2);                   // Calculate distance
                         std::pair<std::string,double> newEntry(key,newDist);      // Make a pair of key,distance
-                        distList.insert(newEntry);                                // Insert pair into map
+                        this->distList.insert(newEntry);                                // Insert pair into map
                         totalDist = totalDist + newDist;                          // Calculate distance
                     }
                 }
@@ -483,14 +484,13 @@ namespace Clustering {
         double totalDist = 0;
         while (i < lhs.__size) {
             while (j < rhs.__size) {
-                if (*lhs_it != *rhs_it) {                                              // If the points aren't equal
+                if (*lhs_it != *rhs_it) {                                               // If the points aren't equal
                     string key = whatIsKey(lhs_it->getID(),rhs_it->getID());
-                    auto dist_it = lhs.distList.find(key);                             // FInd key in map
-                    if (dist_it != lhs.distList.end()) {                               // If dist has been calculated already
-                        totalDist = totalDist + lhs.distList.at(key);                                          // grab distance
-                    }
+                    if (lhs.distList.count(key) > 0)
+                        totalDist = totalDist + lhs.distList.at(key);                   // grab distance
+//                    }
                     else {
-                        double newDist = lhs_it->distanceTo(*rhs_it);                    // Calculate the new distance
+                        double newDist = lhs_it->distanceTo(*rhs_it);                   // Calculate the new distance
                         std::pair<std::string,double> newEntry(key,newDist);            // Make a pair of key, distance
                         totalDist = totalDist + newDist;                                // Calculate total distance
                         lhs.distList.insert(newEntry);                                  // Insert key and totalDist into map
