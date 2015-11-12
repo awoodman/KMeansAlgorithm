@@ -33,6 +33,7 @@ namespace Clustering {
 
         // ID Gen
         void generateID();
+        unsigned int getID() const { return __id; }
 
         // Distance Function
         double distanceTo(const Point<T,dim> &) const;
@@ -42,6 +43,8 @@ namespace Clustering {
         unsigned int getDims() const { return __dim; }
         void setValue(unsigned int, T);
         T getValue(unsigned int index) const { return values[index]; }
+
+//        std::string whatIsKey(const Point<T,dim>&);
 
         // Member Functions
         Point &operator*=(double);

@@ -53,6 +53,26 @@ namespace Clustering {
         __id = id++;
     }
 
+//    template <typename T, int dim>
+//    std::string Cluster<T,dim>::whatIsKey(const T& p1, const T& p2) {
+//        unsigned int id1 = getID(p1);
+//        unsigned int id2 = getID(p2);
+//        string key;
+//        stringstream ss1, ss2;
+//        ss1 << id1;
+//        char* id1str = ss1.str();
+//        ss2 << id2;
+//        char* id2str = ss2.str();
+//
+//        if (id1str < id2str) {
+//            key = strcat(id1str, id2str);
+//        }
+//        else {
+//            key = strcat(id2str, id1str);
+//        }
+//        return key;
+//    };
+
     template <typename T, int dim>
     T & Cluster<T,dim>::operator[](unsigned int index) {
         if (pointList.empty()) {
@@ -401,6 +421,23 @@ namespace Clustering {
         }
     }
 
+    std::string whatIsKey(unsigned int id1, unsigned int id2) {
+        string key;
+        std::stringstream ss1, ss2;
+        ss1 << id1;
+        string id1str = ss1.str();
+        ss2 << id2;
+        string id2str = ss2.str();
+
+        if (id1str < id2str) {
+            key = id1str + id2str;
+        }
+        else {
+            key = id2str + id1str;
+        }
+        return key;
+    }
+
     template <typename T, int dim>
     double Cluster<T,dim>::intraClusterDistance() const
     {
@@ -411,8 +448,19 @@ namespace Clustering {
 
         while (i < __size) {
             while (j < __size) {
-                if (*it1 != *it2) {
-                    totalDist = totalDist + it1->distanceTo(*it2);
+                if (*it1 != *it2) {                                               // If the two points aren't equal
+                    string key = whatIsKey(it1->getID(),it2->getID());                   // Find what the key would be
+                    auto dist_it = distList.find(key);                            // Find the key in the map
+                    if (dist_it != distList.end()) {                              // If dist has been calculated already
+                        double storedDist = distList.at(key);
+                        totalDist = totalDist + storedDist;
+                    }
+                    else {                                                        // If distance hasn't been calc'd
+                        double newDist = it1->distanceTo(*it2);                   // Calculate distance
+                        std::pair<std::string,double> newEntry(key,newDist);      // Make a pair of key,distance
+                        distList.insert(newEntry);                                // Insert pair into map
+                        totalDist = totalDist + newDist;                          // Calculate distance
+                    }
                 }
                 it2++;
                 j++;
@@ -435,8 +483,18 @@ namespace Clustering {
         double totalDist = 0;
         while (i < lhs.__size) {
             while (j < rhs.__size) {
-                if (lhs_it != rhs_it) {
-                    totalDist = totalDist + lhs_it->distanceTo(*rhs_it);
+                if (*lhs_it != *rhs_it) {                                              // If the points aren't equal
+                    string key = whatIsKey(lhs_it->getID(),rhs_it->getID());
+                    auto dist_it = lhs.distList.find(key);                             // FInd key in map
+                    if (dist_it != lhs.distList.end()) {                               // If dist has been calculated already
+                        totalDist = totalDist + lhs.distList.at(key);                                          // grab distance
+                    }
+                    else {
+                        double newDist = lhs_it->distanceTo(*rhs_it);                    // Calculate the new distance
+                        std::pair<std::string,double> newEntry(key,newDist);            // Make a pair of key, distance
+                        totalDist = totalDist + newDist;                                // Calculate total distance
+                        lhs.distList.insert(newEntry);                                  // Insert key and totalDist into map
+                    }
                 }
                 rhs_it++;
                 j++;

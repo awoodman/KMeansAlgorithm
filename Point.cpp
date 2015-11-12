@@ -92,6 +92,28 @@ namespace Clustering {
         values[index] = data;
     }
 
+//    template <typename T,int dim>
+//    std::string Point<T,dim>::whatIsKey(const Point<T,dim>& pt) {
+//        unsigned int id1 = this->__id;
+//        unsigned int id2 = pt.__id;
+//        string key;
+//        std::stringstream ss1, ss2;
+//        ss1 << id1;
+//        string id1str = ss1.str();
+//        ss2 << id2;
+//        string id2str = ss2.str();
+//
+//        if (id1str < id2str) {
+////            key = strcat(id1str, id2str);
+//            key = id1str + id2str;
+//        }
+//        else {
+////            key = strcat(id2str, id1str);
+//            key = id2str + id1str;
+//        }
+//        return key;
+//    }
+
     template <typename T,int dim>
     Point<T,dim> & Point<T,dim>::operator*=(double multiplier) {
         for (int i = 0; i < __dim; i++)

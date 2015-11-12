@@ -2,6 +2,7 @@
 #include "Point.h"
 #include "Cluster.h"
 #include "KMeans.h"
+#include <unordered_map>
 
 using namespace std;
 using namespace Clustering;
@@ -56,28 +57,36 @@ int main() {
 //    cout << c1.intraClusterDistance() << " " << c2.intraClusterDistance() << endl;
 //    cout << c1.getClusterEdges() << " " << c2.getClusterEdges() << endl;
 //    cout << interClusterEdges(c1,c2) << " " << interClusterEdges(c2, c1) << endl;
-
-//    KMeans<Point<double,2>,5,2> test;
-
-    Point<double,3> p1;
-    Point<double,3> p2;
-    Point<double,3> p3;
-    Point<double,3> p4;
-    Point<double,3> p5;
-    p1[0] = 3.1;
-    p2[1] = 4.2;
-    p3[2] = 5.3;
-    p4[0] = 6.4;
-    p5[1] = 7.5;
-    Cluster<Point<double,3>,3> c1;
-    c1.add(p1);
-    c1.add(p2);
-    c1.add(p3);
-    c1.add(p4);
+//
+//    Point<double,3> p1;
+//    Point<double,3> p2;
+//    Point<double,3> p3;
+//    Point<double,3> p4;
+//    Point<double,3> p5;
+//    p1[0] = 3.1;
+//    p2[1] = 4.2;
+//    p3[2] = 5.3;
+//    p4[0] = 6.4;
+//    p5[1] = 7.5;
+//    Cluster<Point<double,3>,3> c1;
+//    c1.add(p1);
+//    c1.add(p2);
+//    c1.add(p3);
+//    c1.add(p4);
 //    c1.add(p5);
+//
+//    std::cout << "c1 contains p1: " << c1.contains(p1) << std::endl;
+//    std::cout << "c1 contains p5: " << c1.contains(p5) << std::endl;
 
-    std::cout << "c1 contains p1: " << c1.contains(p1) << std::endl;
-    std::cout << "c1 contains p5: " << c1.contains(p5) << std::endl;
+    KMeans<Point<double,2>,5,2> test;
+
+//    std::string key = whatIsKey(p1.getID(),p2.getID());
+//    double newDist = p1.distanceTo(p2);
+//    std::unordered_map<std::string,double> map;
+//    std::pair<std::string,double> newEntry(key,newDist);
+//    map.insert(newEntry);
+//
+//    cout << map.at(key);
 
     return 0;
 }
