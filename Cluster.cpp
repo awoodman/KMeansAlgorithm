@@ -420,32 +420,26 @@ namespace Clustering {
     {
         typename std::forward_list<T>::const_iterator it1 = this->pointList.begin();
         typename std::forward_list<T>::const_iterator it2 = it1;
-        int i = 0, j = 0;
         double totalDist = 0;
 
-        while (i < __size) {
-            while (j < __size) {
+        while (it1 != pointList.end()) {
+            while (it2 != pointList.end()) {
                 if (*it1 != *it2) {                                               // If the two points aren't equal
                     unsigned int key = whatIsKey(it1->getID(),it2->getID());      // Find what the key would be
                     if (this->distList.count(key)) {
                         totalDist = totalDist + this->distList.at(key);
-//                        cout << "Accessed value in map, in intraClusterDistance" << endl;
                     }
                     else {                                                        // If distance hasn't been calc'd
                         double newDist = it1->distanceTo(*it2);                   // Calculate distance
                         std::pair<unsigned int,double> newEntry(key,newDist);     // Make a pair of key,distance
                         this->distList.insert(newEntry);                          // Insert pair into map
-//                        cout << "Inserted value in map, in intraClusterDistance" << endl;
                         totalDist = totalDist + newDist;                          // Calculate distance
                     }
                 }
                 it2++;
-                j++;
             }
             it2 = this->pointList.begin();
-            j = 0;
             it1++;
-            i++;
         }
 
         return totalDist/2.0;
@@ -455,32 +449,27 @@ namespace Clustering {
     double interClusterDistance(const Cluster<S,dim> &lhs, const Cluster<S,dim> &rhs) {
         typename std::forward_list<S>::const_iterator lhs_it = lhs.pointList.begin();
         typename std::forward_list<S>::const_iterator rhs_it = rhs.pointList.begin();
-        int i = 0, j = 0;
 
         double totalDist = 0;
-        while (i < lhs.__size) {
-            while (j < rhs.__size) {
+        while (lhs_it != lhs.pointList.end()) {
+            while (rhs_it != rhs.pointList.end()) {
                 if (*lhs_it != *rhs_it) {                                               // If the points aren't equal
                     unsigned int key = whatIsKey(lhs_it->getID(),rhs_it->getID());
                     if (lhs.distList.count(key)) {
                         totalDist = totalDist + lhs.distList.at(key);                   // grab distance
-//                        cout << "Accessed value in map, in interClusterDistance" << endl;
                     }
                     else {
                         double newDist = lhs_it->distanceTo(*rhs_it);                   // Calculate the new distance
                         std::pair<unsigned int,double> newEntry(key,newDist);            // Make a pair of key, distance
                         totalDist = totalDist + newDist;                                // Calculate total distance
                         lhs.distList.insert(newEntry);                                  // Insert key and totalDist into map
-//                        cout << "Inserted value in map, in interClusterDistance" << endl;
                     }
                 }
                 rhs_it++;
-                j++;
             }
             lhs_it++;
-            i++;
+            rhs_it = rhs.pointList.begin();
         }
-
         return totalDist;
     }
 

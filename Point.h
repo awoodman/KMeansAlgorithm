@@ -44,8 +44,6 @@ namespace Clustering {
         void setValue(unsigned int, T);
         T getValue(unsigned int index) const { return values[index]; }
 
-//        std::string whatIsKey(const Point<T,dim>&);
-
         // Member Functions
         Point &operator*=(double);
         Point &operator/=(double);

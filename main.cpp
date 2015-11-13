@@ -69,16 +69,10 @@ int main() {
 //    p4[0] = 6.4;
 //    p5[1] = 7.5;
 //    Cluster<Point<double,3>,3> c1;
-//    c1.add(p1);
-//    c1.add(p2);
-//    c1.add(p3);
-//    c1.add(p4);
-//    c1.add(p5);
+
 
 //    std::cout << "c1 contains p1: " << c1.contains(p1) << std::endl;
 //    std::cout << "c1 contains p5: " << c1.contains(p5) << std::endl;
-
-    KMeans<Point<double,2>,5,2> test;
 
 //    unsigned int key = whatIsKey(p1.getID(),p2.getID());
 //    c1.intraClusterDistance();
@@ -91,6 +85,34 @@ int main() {
 //    map.insert(newEntry);
 //
 //    cout << map.at(key) << " " << map.count(key);
+
+//    Point<double,3> p1;
+//    Point<double,3> p2;
+//    Point<double,3> p3;
+//    Point<double,3> p4;
+//    Point<double,3> p5;
+//    p1[0] = 3.1;
+//    p2[1] = 4.2;
+//    p3[2] = 5.3;
+//    p4[0] = 6.4;
+//    p5[1] = 7.5;
+//    Cluster<Point<double,3>,3> c1;
+//    Cluster<Point<double,3>,3> c2;
+//    c1.add(p1);
+//    c1.add(p2);
+//    c1.add(p3);
+//    c2.add(p4);
+//    c2.add(p5);
+//
+//    cout << p1.distanceTo(p2)+p2.distanceTo(p3)+p1.distanceTo(p3) << endl;
+//    cout << "c1 intraClusterDistance: " << c1.intraClusterDistance() << endl;
+//    cout << "c1 intraClusterEdges: " << c1.getClusterEdges() << endl << endl;
+//
+//    cout << p1.distanceTo(p4)+p1.distanceTo(p5)+p2.distanceTo(p4)+p2.distanceTo(p5)+p3.distanceTo(p4)+p3.distanceTo(p5) << endl;
+//    cout << "c1,c2 interClusterDistance: " << interClusterDistance(c1,c2) << endl;
+//    cout << "c1,c2 interClusterEdges: " << interClusterEdges(c1,c2) << endl << endl;
+
+    KMeans<Point<double,2>,5,2> test;
 
     return 0;
 }

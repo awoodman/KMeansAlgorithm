@@ -82,6 +82,7 @@ namespace Clustering {
                 std::cout << "Iteration: " << ++iter << std::endl;
                 std::cout << "Score: " << score << std::endl;
                 std::cout << "ScoreDiff: " << scoreDiff << std::endl;
+                std::cout << "Max Map Size: " << __point_space->maxMapSize() << endl;
                 std::cout << "Current Map Size: " << __point_space->getMapSize() << std::endl;
                 std::cout << "------------------------------" << std::endl;
             }
@@ -127,19 +128,17 @@ namespace Clustering {
         {
             Din = Din + __clusterArray[i].intraClusterDistance();
         }
-//        cout << "Din done" << endl;
 
         // Compute Dout
-        for (int j = 0; j < __k; j++)
+        for (int j = 0; j < (__k - 1); j++)
         {
-            for (int l = 0; l < __k; l++)
+            for (int l = (j + 1); l < __k; l++)
             {
                 if (j != l) {                           // Don't add distance between itself
                     Dout = Dout + interClusterDistance(__clusterArray[l],__clusterArray[j]);
                 }
             }
         }
-//        cout << "Dout done" << endl;
 
         // Compute Pin
         int Pin = 0;
@@ -147,21 +146,18 @@ namespace Clustering {
         {
             Pin = Pin + __clusterArray[m].getClusterEdges();
         }
-//        cout << "Pin done" << endl;
 
         // Compute Pout
         int Pout = 0;
-        for (int n = 0; n < __k; n++)
+        for (int n = 0; n < (__k - 1); n++)
         {
-            for (int o = n + 1; o < (__k - 1); o++)
+            for (int o = (n + 1); o < __k; o++)
             {
                 Pout = Pout + interClusterEdges(__clusterArray[n],__clusterArray[o]);
             }
         }
-//        cout << "Pout done" << endl;
 
         BetaCV = (Din / Pin) / (Dout / Pout);
-//        cout << "BetaCV done" << endl;
 
         return BetaCV;
     }
