@@ -47,7 +47,7 @@ namespace Clustering {
 
     template <typename T, int dim>
     Cluster<T,dim>::~Cluster() {
-        //TODO: What to destruct?
+        pointList.clear();
     }
 
     template <typename T, int dim>
@@ -387,6 +387,7 @@ namespace Clustering {
             stringstream lineStream(line);
             lineStream >> *p;
             destCluster.add(*p);
+            delete p;
         }
         return is;
     }
@@ -427,12 +428,11 @@ namespace Clustering {
                 if (*it1 != *it2) {                                               // If the two points aren't equal
                     unsigned int key = whatIsKey(it1->getID(),it2->getID());      // Find what the key would be
                     if (this->distList.count(key)) {
-                        totalDist = totalDist + this->distList.at(key);
+                        totalDist = totalDist + distList[key];
                     }
                     else {                                                        // If distance hasn't been calc'd
                         double newDist = it1->distanceTo(*it2);                   // Calculate distance
-                        std::pair<unsigned int,double> newEntry(key,newDist);     // Make a pair of key,distance
-                        this->distList.insert(newEntry);                          // Insert pair into map
+                        distList[key] = newDist;
                         totalDist = totalDist + newDist;                          // Calculate distance
                     }
                 }
@@ -456,13 +456,12 @@ namespace Clustering {
                 if (*lhs_it != *rhs_it) {                                               // If the points aren't equal
                     unsigned int key = whatIsKey(lhs_it->getID(),rhs_it->getID());
                     if (lhs.distList.count(key)) {
-                        totalDist = totalDist + lhs.distList.at(key);                   // grab distance
+                        totalDist = totalDist + lhs.distList[key];
                     }
                     else {
                         double newDist = lhs_it->distanceTo(*rhs_it);                   // Calculate the new distance
-                        std::pair<unsigned int,double> newEntry(key,newDist);            // Make a pair of key, distance
                         totalDist = totalDist + newDist;                                // Calculate total distance
-                        lhs.distList.insert(newEntry);                                  // Insert key and totalDist into map
+                        lhs.distList[key] = newDist;
                     }
                 }
                 rhs_it++;

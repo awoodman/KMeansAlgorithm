@@ -12,6 +12,7 @@
 #include <cstdlib>
 
 #include "Point.h"
+#include "Exceptions.h"
 
 namespace Clustering {
     template <typename T, int dim>
@@ -41,6 +42,10 @@ namespace Clustering {
 
         // Get size
         unsigned int getSize() { return __size; }
+
+//        // Get Map
+//        std::unordered_map<unsigned int, double> getMap() { return distList; };
+        void preAllocMap(unsigned int size) { distList.reserve(size); }
 
         // Get ID
         unsigned int getID() const { return __id; }

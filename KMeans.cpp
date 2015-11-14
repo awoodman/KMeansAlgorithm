@@ -17,18 +17,20 @@ namespace Clustering {
         std::ifstream csv("points.txt");
         __point_space = new Cluster<T,dim>;
         __point_space->setDimensionality(__d);
-//        cout << "Reading in point data" << endl;
         csv >> *__point_space;
-//        cout << "Done reading in point data" << endl;
+        csv.close();
         cout << "Max Map Size: " << __point_space->maxMapSize() << endl;
-        cout << "Number Distances to Store: " << (__point_space->getSize())*(__point_space->getSize()-1)/2 << endl;
+        int numDist = (__point_space->getSize())*(__point_space->getSize()-1)/2;
+        cout << "Number Distances to Store: " << numDist << endl;
         cout << "------------------------------------------" << endl;
         if (__k <= __point_space->getSize()) {
             __point_space->pickPoints(__k, __initCentroids);
-//            cout << "Finished picking initial centroids" << endl;
             __point_space->setCentroid(__initCentroids[0]); // set point_space cluster's centroid as first entry in initCent.
+            __point_space->preAllocMap(numDist);
+//            preAllocSpace(*__point_space,numDist);
 
             __clusterArray.push_back(*__point_space);              // put original pointspace cluster into array
+            delete __point_space;
             for (int i = 1; i < __k; i++)                 // populate the cluster array
             {
                 Cluster<T,dim> *newCluster = new Cluster<T,dim>;
@@ -36,6 +38,7 @@ namespace Clustering {
                 newCluster->setCentroid(__initCentroids[i]);
                 newCluster->validCentroid();
                 __clusterArray.push_back(*newCluster);
+                delete newCluster;
             }
 
 //        KMeans Algorithm
@@ -74,7 +77,6 @@ namespace Clustering {
                 prevScore = score;
 
                 // Compute new Clustering Score
-//                cout << "Begin Compute Clustering Score..." << endl;
                 score = computeClusteringScore();
 
                 scoreDiff = fabs(score - prevScore);
@@ -97,6 +99,7 @@ namespace Clustering {
         else
         {
             std::cout << "You are asking for more clusters than you have points! Program Terminating." << std::endl;
+            delete __point_space;
         }
     }
 
@@ -104,18 +107,12 @@ namespace Clustering {
     template <typename T, int k, int dim>
     KMeans<T,k,dim>::~KMeans()
     {
-//        // Clean up memory
-//        for (int n = 0; n < __k; n++)
-//        {
-//            int size = __clusterArray[n].getSize();
-//
-//            for (int i = 0; i < size; i++) {
-//                delete __clusterArray[n][i];    // delete all points in each cluster
-//            }
-//
-//            delete __clusterArray[n];     // delete 'k' dynamic clusters
-//        }
-//        delete [] clusterArray;            // delete dynamic cluster array
+//        auto it = __clusterArray.begin();
+//        auto last_it = it;
+//        for (int i = 0; i < __k; i++)
+//            last_it = it;
+//            it++;
+//            delete last_it;
     }
 
     template <typename T, int k, int dim>
@@ -161,4 +158,5 @@ namespace Clustering {
 
         return BetaCV;
     }
+
 }

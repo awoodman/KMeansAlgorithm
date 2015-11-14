@@ -21,9 +21,9 @@ namespace Clustering {
     public:
         static constexpr double SCORE_DIFF_THRESHOLD = 0.001;
         KMeans();
-//        KMeans(int,int);
         ~KMeans();
         double computeClusteringScore();
+//        void preAllocSpace(Cluster<T,dim> &, int);
     };
 }
 

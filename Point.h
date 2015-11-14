@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <vector>
+#include "Exceptions.h"
 
 using std::vector;
 using std::cout;
