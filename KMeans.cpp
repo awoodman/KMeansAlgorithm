@@ -14,14 +14,15 @@ namespace Clustering {
         double scoreDiff = SCORE_DIFF_THRESHOLD + 1;
 
         // Initializing Algorithm
+        std::cout << "Initializing KMeans Algorithm, terminating on ScoreDiff < " << SCORE_DIFF_THRESHOLD << endl;
         std::ifstream csv("points.txt");
         __point_space = new Cluster<T,dim>;
         __point_space->setDimensionality(__d);
         csv >> *__point_space;
         csv.close();
-        cout << "Max Map Size: " << __point_space->maxMapSize() << endl;
+        cout << "Max Map Size for Distances: " << __point_space->maxMapSize() << endl;
         int numDist = (__point_space->getSize())*(__point_space->getSize()-1)/2;
-        cout << "Number Distances to Store: " << numDist << endl;
+        cout << "Number Distances to Store:  " << numDist << endl;
         cout << "------------------------------------------" << endl;
         if (__k <= __point_space->getSize()) {
             __point_space->pickPoints(__k, __initCentroids);
@@ -63,6 +64,7 @@ namespace Clustering {
                         }
                         if (closestCentInd != i) {
                             typename Cluster<T,dim>::Move(point, &__clusterArray[i], &__clusterArray[closestCentInd]).perform();
+                            j--;
                         }
                     }
                 }
