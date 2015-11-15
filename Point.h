@@ -43,7 +43,7 @@ namespace Clustering {
         void setDims(unsigned int);
         unsigned int getDims() const { return __dim; }
         void setValue(unsigned int, T);
-        T getValue(unsigned int index) const { return values[index]; }
+        T getValue(unsigned int index) const;
 
         // Member Functions
         Point &operator*=(double);
@@ -52,11 +52,16 @@ namespace Clustering {
         const Point operator/(double) const;
         T& operator[](unsigned int index)
         {
-            if (index >= 0 && index < __dim)
+            try {
+                if (index < 0 || index >= __dim) {
+                    OutOfBoundsEx error(index, __dim - 1);
+                    throw error;
+                }
                 return values[index];
-            else {
-                cout << "Out of bounds" << endl;
-                //TODO: Return what here?
+            } catch (OutOfBoundsEx error) {
+                std::cerr << error;
+                std::cerr << "Returning value of maximum valid index" << std::endl;
+                return values[__dim - 1];
             }
         }
 

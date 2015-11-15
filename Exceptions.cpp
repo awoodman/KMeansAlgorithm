@@ -32,12 +32,13 @@ namespace Clustering {
     }
 
 
-    RemoveFromEmptyEx::RemoveFromEmptyEx() {
-        __name = "RemoveFromEmptyEx";
+    RemoveFromEmptyEx::RemoveFromEmptyEx(std::string name, unsigned int clusterId) {
+        __name = name;
+        __clusterId = clusterId;
     }
 
     std::ostream &operator<<(std::ostream &os, const RemoveFromEmptyEx &RemEmpEx) {
-        os << RemEmpEx.__name << std::endl;
+        os << RemEmpEx.__name << ": ID = " << RemEmpEx.__clusterId << std::endl;
     }
 
 }

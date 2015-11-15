@@ -87,22 +87,28 @@ int main() {
 //    cout << map.at(key) << " " << map.count(key);
 
 //    Point<double,3> p1;
-//    Point<double,3> p2;
+//    Point<double,4> p2;
 //    Point<double,3> p3;
 //    Point<double,3> p4;
 //    Point<double,3> p5;
-//    p1[0] = 3.1;
+//    p1[2] = 3.1;
 //    p2[1] = 4.2;
 //    p3[2] = 5.3;
 //    p4[0] = 6.4;
 //    p5[1] = 7.5;
+
 //    Cluster<Point<double,3>,3> c1;
-//    Cluster<Point<double,3>,3> c2;
 //    c1.add(p1);
-//    c1.add(p2);
 //    c1.add(p3);
-//    c2.add(p4);
-//    c2.add(p5);
+
+//    cout << c1[-1] << endl;
+//    cout << c1[3] << endl;
+//    cout << p1[5];
+
+//    c1.computeCentroid();
+//    Cluster<Point<double,3>,3> c2;
+//    c1.remove(p1);
+
 //
 //    cout << p1.distanceTo(p2)+p2.distanceTo(p3)+p1.distanceTo(p3) << endl;
 //    cout << "c1 intraClusterDistance: " << c1.intraClusterDistance() << endl;
@@ -113,6 +119,9 @@ int main() {
 //    cout << "c1,c2 interClusterEdges: " << interClusterEdges(c1,c2) << endl << endl;
 
     KMeans<Point<double,2>,5,2> test;
+
+//    p1[5];
+//    p1.getValue(8);
 
     return 0;
 }

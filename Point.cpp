@@ -5,6 +5,7 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 #include <cmath>
 
 #include "Point.h"
@@ -49,6 +50,14 @@ namespace Clustering {
     Point<T,dim>& Point<T,dim>::operator=(const Point<T,dim> & src) {
         if (this->__id != src.__id)
         {
+            try {
+                if (this->__dim != src.__dim) {
+                    DimensionalityMismatchEx error(src.__dim, __dim);
+                    throw error;
+                }
+            } catch (DimensionalityMismatchEx error) {
+                std::cerr << error;
+            }
             __id = src.__id;
             __dim = src.__dim;
             values = src.values;
@@ -93,6 +102,21 @@ namespace Clustering {
     }
 
     template <typename T,int dim>
+    T Point<T,dim>::getValue(unsigned int index) const {
+        try {
+            if (index < 0 || index >= __dim) {
+                OutOfBoundsEx error(index, __dim - 1);
+                throw error;
+            }
+            return values[index];
+        } catch (OutOfBoundsEx error) {
+            std::cerr << error;
+            std::cerr << "Returning value of maximum valid index" << std::endl;
+            return values[__dim - 1];
+        }
+    };
+
+    template <typename T,int dim>
     Point<T,dim> & Point<T,dim>::operator*=(double multiplier) {
         for (int i = 0; i < __dim; i++)
             values[i] = values[i] * multiplier;
@@ -130,91 +154,119 @@ namespace Clustering {
 
     template <typename S, int dim>
     Point<S,dim> &operator+=(Point<S,dim> & dst, const Point<S,dim> & src) {
-        if (dst.__dim == src.__dim) {
-            for (int i = 0; i < src.__dim; i++) {
-                dst.values[i] = dst.values[i] + src.values[i];
+        try {
+            if (dst.__dim != src.__dim) {
+                DimensionalityMismatchEx error(src.__dim, dst.__dim);
+                throw error;
             }
+            for (int i = 0; i < src.__dim; i++)
+                dst.values[i] = dst.values[i] + src.values[i];
+        } catch (DimensionalityMismatchEx error) {
+            std::cerr << error;
         }
-        else
-            cout << "The dimensions of these points are different" << endl;
     }
 
     template <typename S, int dim>
     Point<S,dim> &operator-=(Point<S,dim> & dst, const Point<S,dim> & src) {
-        if (dst.__dim == src.__dim) {
-            for (int i = 0; i < src.__dim; i++) {
-                dst.values[i] = dst.values[i] - src.values[i];
+        try {
+            if (dst.__dim != src.__dim) {
+                DimensionalityMismatchEx error(src.__dim, dst.__dim);
+                throw error;
             }
+            for (int i = 0; i < src.__dim; i++)
+                dst.values[i] = dst.values[i] - src.values[i];
+        } catch (DimensionalityMismatchEx error) {
+            std::cerr << error;
         }
-        else
-            cout << "The dimensions of these points are different" << endl;
     }
 
     template <typename S, int dim>
     const Point<S,dim> operator+(const Point<S,dim> & dst, const Point<S,dim> & src) {
-        if (dst.__dim == src.__dim) {
-            Point<S,dim> sum(dst);
-            for (int i = 0; i < src.__dim; i++) {
-                sum.values[i] = sum.values[i] + src.values[i];
+        try {
+            if (dst.__dim != src.__dim) {
+                DimensionalityMismatchEx error(src.__dim, dst.__dim);
+                throw error;
             }
+            Point<S, dim> sum(dst);
+            for (int i = 0; i < src.__dim; i++)
+                sum.values[i] = sum.values[i] + src.values[i];
+        } catch (DimensionalityMismatchEx error) {
+            std::cerr << error;
         }
-        else
-            cout << "The dimensions of these points are different" << endl;
     }
 
     template <typename S, int dim>
     const Point<S,dim> operator-(const Point<S,dim> & dst, const Point<S,dim> & src) {
-        if (dst.__dim == src.__dim) {
-            Point<S,dim> sum(dst);
-            for (int i = 0; i < src.__dim; i++) {
-                sum.values[i] = sum.values[i] - src.values[i];
+        try {
+            if (dst.__dim != src.__dim) {
+                DimensionalityMismatchEx error(src.__dim, dst.__dim);
+                throw error;
             }
+            Point<S, dim> sum(dst);
+            for (int i = 0; i < src.__dim; i++)
+                sum.values[i] = sum.values[i] - src.values[i];
+        } catch (DimensionalityMismatchEx error) {
+            std::cerr << error;
         }
-        else
-            cout << "The dimensions of these points are different" << endl;
     }
 
     template <typename S, int dim>
     bool operator==(const Point<S,dim> & lhs, const Point<S,dim> & rhs) {
-        if (lhs.__id != rhs.__id)
-            return false;
-        else if (lhs.__dim != rhs.__dim)
-            return false;
-        else {
-            for (int i = 0; i < lhs.__dim; i++) {
-                if (lhs.values[i] != rhs.values[i]) {
-                    return false;
-                }
+        try {
+            if (lhs.__dim != rhs.__dim) {
+                DimensionalityMismatchEx error(lhs.__dim, rhs.__dim);
+                throw error;
             }
-            return true;
+            if (lhs.__id != rhs.__id)
+                return false;
+            else {
+                for (int i = 0; i < lhs.__dim; i++) {
+                    if (lhs.values[i] != rhs.values[i])
+                        return false;
+                }
+                return true;
+            }
+        } catch (DimensionalityMismatchEx error) {
+            std::cerr << error;
         }
+        return false;
     }
 
     template <typename S, int dim>
     bool operator!=(const Point<S,dim> & lhs, const Point<S,dim> & rhs) {
-        bool decision;
-        if (lhs.__id == rhs.__id)
-            return false;
-        else if (lhs.__dim != rhs.__dim)
-            return true;
-        else {
-            for (int i = 0; i < lhs.__dim; i++) {
-                if (lhs.values[i] == rhs.values[i])
-                    decision = false;
-                else
-                    return true;
+        bool decision = true;
+        try {
+            if (lhs.__dim != rhs.__dim) {
+                DimensionalityMismatchEx error(lhs.__dim, rhs.__dim);
+                throw error;
             }
+            if (lhs.__id == rhs.__id)
+                return false;
+            else {
+                for (int i = 0; i < lhs.__dim; i++) {
+                    if (lhs.values[i] == rhs.values[i])
+                        decision = false;
+                    else
+                        return true;
+                }
+            }
+        } catch (DimensionalityMismatchEx error) {
+            std::cerr << error;
+            bool decision = true;
         }
         return decision;
     }
 
     template <typename S, int dim>
     bool operator<(const Point<S,dim> & lhs, const Point<S,dim> & rhs) {
-        if (lhs.__dim == rhs.__dim) {
+        try {
+            if (lhs.__dim != rhs.__dim) {
+                DimensionalityMismatchEx error(lhs.__dim, rhs.__dim);
+                throw error;
+            }
             bool decision;
             for (int i = 0; i < lhs.__dim; i++) {
-                if (lhs.values[i] > rhs.values[i])
-                {
+                if (lhs.values[i] > rhs.values[i]) {
                     return false;
                 }
                 else if (lhs.values[i] == rhs.values[i])
@@ -222,18 +274,21 @@ namespace Clustering {
                 else if (lhs.values[i] < rhs.values[i])
                     return true;
             }
+        } catch (DimensionalityMismatchEx error) {
+            std::cerr << error;
         }
-        else
-            cout << "The dimensions of these points are different" << endl;
     }
 
     template <typename S, int dim>
     bool operator>(const Point<S,dim> & lhs, const Point<S,dim> & rhs) {
-        if (lhs.__dim == rhs.__dim) {
+        try {
+            if (lhs.__dim != rhs.__dim) {
+                DimensionalityMismatchEx error(lhs.__dim, rhs.__dim);
+                throw error;
+            }
             bool decision;
             for (int i = 0; i < lhs.__dim; i++) {
-                if (lhs.values[i] < rhs.values[i])
-                {
+                if (lhs.values[i] < rhs.values[i]) {
                     return false;
                 }
                 else if (lhs.values[i] == rhs.values[i])
@@ -241,47 +296,57 @@ namespace Clustering {
                 else if (lhs.values[i] > rhs.values[i])
                     return true;
             }
+        } catch (DimensionalityMismatchEx error) {
+            std::cerr << error;
         }
-        else
-            cout << "The dimensions of these points are different" << endl;
     }
 
     template <typename S, int dim>
     bool operator<=(const Point<S,dim> & lhs, const Point<S,dim> & rhs) {
-        bool decision = true;
-        for (int i = 0; i < lhs.__dim; i++)
-        {
-            if (lhs.values[i] > rhs.values[i])
-            {
-                return false;
+        try {
+            if (lhs.__dim != rhs.__dim) {
+                DimensionalityMismatchEx error(lhs.__dim, rhs.__dim);
+                throw error;
             }
-            else if (lhs.values[i] == rhs.values[i])
-            {
-                decision = true;
+            bool decision = true;
+            for (int i = 0; i < lhs.__dim; i++) {
+                if (lhs.values[i] > rhs.values[i]) {
+                    return false;
+                }
+                else if (lhs.values[i] == rhs.values[i]) {
+                    decision = true;
+                }
+                else if (lhs.values[i] < rhs.values[i])
+                    return true;
             }
-            else if (lhs.values[i] < rhs.values[i])
-                return true;
+            return decision;
+        } catch (DimensionalityMismatchEx error) {
+            std::cerr << error;
         }
-        return decision;
     }
 
     template <typename S, int dim>
     bool operator>=(const Point<S,dim> & lhs, const Point<S,dim> & rhs) {
-        bool decision = true;
-        for (int i  = 0; i < lhs.__dim; i++)
-        {
-            if (lhs.values[i] < rhs.values[i])
-            {
-                return false;
+        try {
+            if (lhs.__dim != rhs.__dim) {
+                DimensionalityMismatchEx error(lhs.__dim, rhs.__dim);
+                throw error;
             }
-            else if (lhs.values[i] == rhs.values[i])
-            {
-                decision = true;
+            bool decision = true;
+            for (int i = 0; i < lhs.__dim; i++) {
+                if (lhs.values[i] < rhs.values[i]) {
+                    return false;
+                }
+                else if (lhs.values[i] == rhs.values[i]) {
+                    decision = true;
+                }
+                else if (lhs.values[i] > rhs.values[i])
+                    return true;
             }
-            else if (lhs.values[i] > rhs.values[i])
-                return true;
+            return decision;
+        } catch (DimensionalityMismatchEx error) {
+            std::cerr << error;
         }
-        return decision;
     }
 
     template <typename S, int dim>
@@ -306,11 +371,25 @@ namespace Clustering {
         string value;
         S d;
 
-        int i = 0;
-        while (getline(inputStream, value, DELIM)) {     // While delimiter (',') not yet reached
-            d = atof(value.c_str());                    // Convert string to double
-            pt.setValue(i++,d);                         // Post-inc 'i'
+        string s;
+        inputStream >> s;
+        std::size_t delimCount = std::count(s.begin(), s.end(), DELIM) + 1;
+
+        try {
+            if (delimCount != dim) {
+                DimensionalityMismatchEx error(dim, delimCount);
+                throw error;
+            }
+            std::stringstream lineStream(s);
+
+            int i = 0;
+            while (getline(lineStream, value, DELIM)) {
+                d = atof(value.c_str());                    // Convert string to double
+                pt.setValue(i++, d);                         // Post-inc 'i'
+            }
+            return inputStream;
+        } catch (DimensionalityMismatchEx error) {
+            std::cerr << error;
         }
-        return inputStream;
     }
 }

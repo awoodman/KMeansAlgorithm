@@ -27,7 +27,6 @@ namespace Clustering {
             __point_space->pickPoints(__k, __initCentroids);
             __point_space->setCentroid(__initCentroids[0]); // set point_space cluster's centroid as first entry in initCent.
             __point_space->preAllocMap(numDist);
-//            preAllocSpace(*__point_space,numDist);
 
             __clusterArray.push_back(*__point_space);              // put original pointspace cluster into array
             delete __point_space;

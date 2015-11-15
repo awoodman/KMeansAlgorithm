@@ -22,7 +22,7 @@ namespace Clustering {
     std::unordered_map<unsigned int,double> Cluster<T,dim>::distList;
 
     template <typename T, int dim>
-    Cluster<T,dim>::Cluster(const Cluster<T,dim>& src): __centroid(0) {
+    Cluster<T,dim>::Cluster(const Cluster<T,dim>& src): __centroid(dim) {
         __centroid = src.__centroid;
         generateID();
         __size = src.__size;
@@ -35,6 +35,7 @@ namespace Clustering {
     Cluster<T,dim> &Cluster<T,dim>::operator=(const Cluster<T,dim>& src) {
         pointList.clear();
         if (this->__id != src.__id) {
+            __centroid = src.__centroid;
             __size = src.__size;
             __dim = src.__dim;
             __valid_centroid = false;
@@ -58,18 +59,24 @@ namespace Clustering {
 
     template <typename T, int dim>
     T & Cluster<T,dim>::operator[](unsigned int index) {
-        if (pointList.empty()) {
-            cout << "The cluster is empty" << endl;
-            //TODO: Return what here?
-        }
-        else {
-            if (index < __size) {
-                typename std::forward_list<T>::iterator it = pointList.begin();
-                for (int i = 0; i < index; i++) {
-                    it++;
-                }
-                return *it;
+        try {
+            if (index < 0 || index >= __dim) {
+                OutOfBoundsEx error(index, __dim - 1);
+                throw error;
             }
+            typename std::forward_list<T>::iterator it = pointList.begin();
+            for (int i = 0; i < index; i++) {
+                it++;
+            }
+            return *it;
+        } catch (OutOfBoundsEx error) {
+            std::cerr << error;
+            std::cerr << "Returning value of maximum valid index" << std::endl;
+            typename std::forward_list<T>::iterator it = pointList.begin();
+            for (int i = 1; i < __size; i++) {
+                it++;
+            }
+            return *it;
         }
     }
 
@@ -104,17 +111,24 @@ namespace Clustering {
 
     template <typename T, int dim>
     void Cluster<T,dim>::computeCentroid() {
-        T p(__dim);
-        typename std::forward_list<T>::iterator it = pointList.begin();
+        try {
+            if (__size == 0) {
+                RemoveFromEmptyEx error("Attempted to Compute Centroid of Empty Cluster", getID());
+                throw error;
+            }
+            T p(__dim);
+            typename std::forward_list<T>::iterator it = pointList.begin();
 
-        while (it != pointList.end())
-        {
-            p += *it/__size;
-            it++;
+            while (it != pointList.end()) {
+                p += *it / __size;
+                it++;
+            }
+
+            this->setCentroid(p);
+            __valid_centroid = true;
+        } catch (RemoveFromEmptyEx error) {
+            std::cerr << error;
         }
-
-        this->setCentroid(p);
-        __valid_centroid = true;
     }
 
     template <typename T, int dim>
@@ -175,34 +189,42 @@ namespace Clustering {
 
     template <typename T, int dim>
     const T & Cluster<T,dim>::remove(const T & remPoint) {
-        if (pointList.front() == remPoint) {
-            pointList.pop_front();
-            invalidateCentroid();
-            __size--;
-            return remPoint;
-        }
-        else {
-            bool found = false;
-            typename std::forward_list<T>::iterator it = pointList.begin();
-            typename std::forward_list<T>::iterator it_next = pointList.begin();
-            it_next++;
-            int i = 0;
-            while (*it_next != remPoint && (it_next != pointList.end())) {
-                it++;
-                it_next++;
-                i++;
+        try {
+            if (__size == 0) {
+                RemoveFromEmptyEx error("Attempting to remove from empty Cluster", getID());
+                throw error;
             }
-            if (*it_next == remPoint) {
-                found = true;
-                pointList.erase_after(it);
-            }
-            if (found) {
+            if (pointList.front() == remPoint) {
+                pointList.pop_front();
+                invalidateCentroid();
                 __size--;
-                this->invalidateCentroid();
                 return remPoint;
             }
-            else
-                cout << "The point was not found in this cluster" << endl;
+            else {
+                bool found = false;
+                typename std::forward_list<T>::iterator it = pointList.begin();
+                typename std::forward_list<T>::iterator it_next = pointList.begin();
+                it_next++;
+                int i = 0;
+                while (*it_next != remPoint && (it_next != pointList.end())) {
+                    it++;
+                    it_next++;
+                    i++;
+                }
+                if (*it_next == remPoint) {
+                    found = true;
+                    pointList.erase_after(it);
+                }
+                if (found) {
+                    __size--;
+                    this->invalidateCentroid();
+                    return remPoint;
+                }
+                else
+                    cout << "The point was not found in this cluster" << endl;
+            }
+        } catch (RemoveFromEmptyEx error) {
+            std::cerr << error;
         }
     }
 
@@ -383,11 +405,20 @@ namespace Clustering {
         static const char DELIM = ',';
 
         while (getline(is,line)) {                                 // While '\n' not yet reached (takes in whole line)
-            S* p = new S;
-            stringstream lineStream(line);
-            lineStream >> *p;
-            destCluster.add(*p);
-            delete p;
+            try {
+                std::size_t delimCount = std::count(line.begin(), line.end(), DELIM) + 1;
+                if (delimCount != dim) {
+                    DimensionalityMismatchEx error(dim, delimCount);
+                    throw error;
+                }
+                S *p = new S;
+                stringstream lineStream(line);
+                lineStream >> *p;
+                destCluster.add(*p);
+                delete p;
+            } catch (DimensionalityMismatchEx error) {
+                std::cerr << error;
+            }
         }
         return is;
     }

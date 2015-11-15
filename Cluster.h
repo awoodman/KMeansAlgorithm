@@ -27,7 +27,7 @@ namespace Clustering {
         static std::unordered_map<unsigned int,double> distList;      // map w/ key type int,data type double
     public:
         // Constructors
-        Cluster() : __dim(dim), __size(0), __valid_centroid(false), __centroid(0) { generateID(); };
+        Cluster() : __dim(dim), __size(0), __valid_centroid(false), __centroid(dim) { generateID(); };
 
         // Big 3 (cpy const, assign op, destr)
         Cluster(const Cluster<T,dim>&);
@@ -119,7 +119,7 @@ namespace Clustering {
             Cluster<T,dim>* __to;
             T __point;
         public:
-            Move(const T pt, Cluster<T,dim>* from_set, Cluster<T,dim>* to_set) : __point(0)
+            Move(const T pt, Cluster<T,dim>* from_set, Cluster<T,dim>* to_set) : __point(dim)
             {
                 __point = pt;
                 __from = from_set;

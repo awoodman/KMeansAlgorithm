@@ -23,7 +23,6 @@ namespace Clustering {
         KMeans();
         ~KMeans();
         double computeClusteringScore();
-//        void preAllocSpace(Cluster<T,dim> &, int);
     };
 }
 

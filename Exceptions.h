@@ -35,10 +35,12 @@ namespace Clustering {
 
     class RemoveFromEmptyEx {
     private:
+        unsigned int __clusterId;
         std::string __name;
     public:
-        RemoveFromEmptyEx();
+        RemoveFromEmptyEx(std::string name, unsigned int);
         std::string getName() { return __name; };
+        unsigned int getID() { return __clusterId; }
         friend std::ostream &operator<<(std::ostream &, const RemoveFromEmptyEx &);
     };
 }
