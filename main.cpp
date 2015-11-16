@@ -118,7 +118,8 @@ int main() {
 //    cout << "c1,c2 interClusterDistance: " << interClusterDistance(c1,c2) << endl;
 //    cout << "c1,c2 interClusterEdges: " << interClusterEdges(c1,c2) << endl << endl;
 
-    KMeans<Point<double,2>,5,2> test;
+//    KMeans<Point<double,3>,3,3> test;
+    KMeans<Point<double,2>,10,2> test;
 
 //    p1[5];
 //    p1.getValue(8);

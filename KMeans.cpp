@@ -14,10 +14,11 @@ namespace Clustering {
         double scoreDiff = SCORE_DIFF_THRESHOLD + 1;
 
         // Initializing Algorithm
-        std::cout << "Initializing KMeans Algorithm, terminating on ScoreDiff < " << SCORE_DIFF_THRESHOLD << endl;
+        std::cout << "***********************************************************************" << std::endl;
+        std::cout << "*** Initializing KMeans Algorithm, terminating on ScoreDiff < " << SCORE_DIFF_THRESHOLD << " ***" << std::endl;
+        std::cout << "***********************************************************************" << std::endl;
         std::ifstream csv("points.txt");
         __point_space = new Cluster<T,dim>;
-        __point_space->setDimensionality(__d);
         csv >> *__point_space;
         csv.close();
         cout << "Max Map Size for Distances: " << __point_space->maxMapSize() << endl;
@@ -34,7 +35,6 @@ namespace Clustering {
             for (int i = 1; i < __k; i++)                 // populate the cluster array
             {
                 Cluster<T,dim> *newCluster = new Cluster<T,dim>;
-                newCluster->setDimensionality(__d);
                 newCluster->setCentroid(__initCentroids[i]);
                 newCluster->validCentroid();
                 __clusterArray.push_back(*newCluster);

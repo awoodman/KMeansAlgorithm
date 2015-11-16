@@ -24,7 +24,8 @@ namespace Clustering {
     template <typename T, int dim>
     Cluster<T,dim>::Cluster(const Cluster<T,dim>& src): __centroid(dim) {
         __centroid = src.__centroid;
-        generateID();
+        __id = src.__id;
+//        generateID();
         __size = src.__size;
         __dim = src.__dim;
         __valid_centroid = false;
@@ -35,6 +36,7 @@ namespace Clustering {
     Cluster<T,dim> &Cluster<T,dim>::operator=(const Cluster<T,dim>& src) {
         pointList.clear();
         if (this->__id != src.__id) {
+            __id = src.__id;
             __centroid = src.__centroid;
             __size = src.__size;
             __dim = src.__dim;

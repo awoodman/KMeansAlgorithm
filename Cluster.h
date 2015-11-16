@@ -43,8 +43,7 @@ namespace Clustering {
         // Get size
         unsigned int getSize() { return __size; }
 
-//        // Get Map
-//        std::unordered_map<unsigned int, double> getMap() { return distList; };
+        // Preallocate Map Space
         void preAllocMap(unsigned int size) { distList.reserve(size); }
 
         // Get ID
